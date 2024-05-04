@@ -1,0 +1,67 @@
+//
+//
+//      uganet
+//      test.c
+//
+
+#include <test_str.h>
+#include <test_strview.h>
+//#include <test_cli.h>
+#include <test_talk.h>
+
+
+int main ( void )
+{
+        uga_log_init() ;
+
+////////////////////////////////////////////////////////////////////////////////
+/// str
+        printf( "\n" ) ;
+        UGA_INFO_S( "test::str", "starting str tests..." ) ;
+
+        test_str() ;
+
+        UGA_INFO_S( "test::str", "finished." ) ;
+        printf( "\n" ) ;
+///
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+/// strview
+        printf( "\n" ) ;
+        UGA_INFO_S( "test::strview", "starting strview tests..." ) ;
+
+        test_strview() ;
+
+        UGA_INFO_S( "test::strview", "finished." ) ;
+        printf( "\n" ) ;
+///
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+/// cli
+///     printf( "\n" ) ;
+///     UGA_INFO_S( "test::cli", "starting cli tests..." ) ;
+///
+///     test_cli() ;
+///
+///     UGA_INFO_S( "test::cli", "finished." ) ;
+///     printf( "\n" ) ;
+///
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+/// talk
+        printf( "\n" ) ;
+        UGA_INFO_S( "test::talk", "starting talk tests..." ) ;
+
+        test_talk() ;
+
+        UGA_INFO_S( "test::talk", "finished." ) ;
+        printf( "\n" ) ;
+///
+////////////////////////////////////////////////////////////////////////////////
+
+
+        return 0 ;
+}

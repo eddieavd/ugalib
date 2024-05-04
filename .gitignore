@@ -1,0 +1,13 @@
+
+*.a
+*.o
+
+*.swp
+*.swo
+
+*.json
+
+*.dSYM
+
+*cache*
+*cmake*
