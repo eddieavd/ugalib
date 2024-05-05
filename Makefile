@@ -1,15 +1,15 @@
 # ugalib
 
 PROJECT = ugalib
-SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c
+SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/net/uga_mplex.c src/core/uga_vector.c
 
 # CC  = clang-18
 # CXX = clang++-18
 
-CC  = cc
-CXX = c++
+# CC  = cc
+# CXX = c++
 
-# CC = zig cc -target aarch64-linux-gnu
+CC = zig cc -target aarch64-linux-gnu
 
 IDIR = ./include
 LDIR = ./lib
@@ -32,7 +32,7 @@ INSTALL_IDIR = /usr/include/uga
 dir_guard = @mkdir -p $(@D)
 
 .PHONY: all
-all: $(LIBFILE) examples test
+all: $(LIBFILE) examples mrepro test
 
 .PHONY: libonly
 libonly: $(LIBFILE)
@@ -41,6 +41,12 @@ $(LIBFILE): $(OBJECTS)
 	$(dir_guard)
 	ar ru $@ $^
 	ranlib $@
+
+.PHONY: mrepro
+mrepro: $(LIBFILE)
+	mkdir -p $(BINDIR)
+	$(CC) $(CFLAGS) mrepro/bot.c    -o bot    $(LDFLAGS)
+	$(CC) $(CFLAGS) mrepro/server.c -o server $(LDFLAGS)
 
 .PHONY: examples
 examples: $(LIBFILE)
@@ -70,11 +76,11 @@ install:
 .PHONY: clean
 clean:
 	for file in $(CLEANEXTS); do rm -f *.$$file; rm -f src/core/*.$$file; rm -f src/net/*.$$file; rm -f lib/*.$$file; rm -f ../lib/*$$file; done
-	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test
+	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test bot server
 
 .PHONY: cleanall
 cleanall:
 	for file in $(CLEANEXTS); do rm -f *.$$file; rm -f src/core/*.$$file; rm -f src/net/*.$$file; rm -f lib/*.$$file; rm -f ../lib/*$$file; done
-	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test
+	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test bot server
 	-rm -rf $(INSTALL_IDIR)
 	-rm -f $(INSTALL_LDIR)/libuga.a

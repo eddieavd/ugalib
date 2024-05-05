@@ -17,8 +17,6 @@
 
 #include <core/uga_types.h>
 
-#include <stdbool.h>
-
 
 typedef struct
 {

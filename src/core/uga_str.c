@@ -110,7 +110,7 @@ void uga_str_reserve ( uga_string * str, i64_t const capacity )
         {
                 return ;
         }
-        uga_reallocate( str->data, capacity ) ;
+        uga_reallocate( ( void ** ) &str->data, capacity ) ;
 
         if( uga_had_errs() ) return ;
 
@@ -184,6 +184,12 @@ void uga_str_append ( uga_string * str, char const * data, i64_t const datalen )
         }
 }
 
+void uga_str_clear ( uga_string * str )
+{
+        memset( str->data, '\0', str->capacity ) ;
+        str->size = 0 ;
+}
+
 void uga_str_destroy ( uga_string * str )
 {
         if( str->data )
@@ -193,4 +199,9 @@ void uga_str_destroy ( uga_string * str )
         str->data     = NULL ;
         str->size     =    0 ;
         str->capacity =    0 ;
+}
+
+void uga_str_destroy_void ( void * str )
+{
+        uga_str_destroy( str ) ;
 }

@@ -24,18 +24,18 @@ void * uga_allocate ( i64_t const bytes )
         return buff ;
 }
 
-void uga_reallocate ( void * buff, i64_t const bytes )
+void uga_reallocate ( void ** buff, i64_t const bytes )
 {
         uga_clr_errs() ;
 
-        void * reallocation = realloc( buff, bytes ) ;
+        void * reallocation = realloc( *buff, bytes ) ;
         if( !reallocation )
         {
                 UGA_ERR_S( "uga::reallocate", "failed reallocating block of size %d to new size of %d", -1, bytes ) ;
                 uga_set_alloc_error( UGA_ERR_BAD_REALLOC, bytes ) ;
                 return ;
         }
-        buff = reallocation ;
+        *buff = reallocation ;
 }
 
 void uga_deallocate ( void * buff )

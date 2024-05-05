@@ -28,9 +28,9 @@ uga_string_view uga_sv_create_2 ( char const * data, i64_t const size ) ;
 
 uga_string_view uga_sv_create_from ( struct uga_string_t const * str ) ;
 
-i32_t uga_sv_equal       ( uga_string_view const *  lhs, uga_string_view const *    rhs ) ;
-i32_t uga_sv_starts_with ( uga_string_view const * this, uga_string_view const * prefix ) ;
-i32_t uga_sv_ends_with   ( uga_string_view const * this, uga_string_view const * suffix ) ;
+i32_t uga_sv_equal       ( uga_string_view  lhs, uga_string_view    rhs ) ;
+i32_t uga_sv_starts_with ( uga_string_view this, uga_string_view prefix ) ;
+i32_t uga_sv_ends_with   ( uga_string_view this, uga_string_view suffix ) ;
 
 void uga_sv_trim       ( uga_string_view * this ) ;
 void uga_sv_trim_left  ( uga_string_view * this ) ;
@@ -52,7 +52,7 @@ i32_t uga_sv_contains ( uga_string_view const * this, char const val ) ;
 i64_t uga_sv_index_of ( uga_string_view const * this, char const val ) ;
 i64_t uga_sv_count    ( uga_string_view const * this, char const val ) ;
 
-uga_string_view uga_sv_chop_to_delimiter ( uga_string_view * this, char const delim ) ;
+uga_string_view uga_sv_chop_to_delimiter ( uga_string_view * this, char const delim, bool discard_delimiter ) ;
 
 i64_t uga_sv_parse_int ( uga_string_view const * this ) ;
 

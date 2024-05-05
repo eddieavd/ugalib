@@ -10,8 +10,6 @@
 
 #include <core/uga_types.h>
 
-#include <stdbool.h>
-
 #define STR_FMT "%.*s"
 #define STR_ARG(str) (i32_t) (str).size, (str).data
 
@@ -57,7 +55,10 @@ void uga_str_push_back ( uga_string * str, char const val ) ;
 
 void uga_str_append ( uga_string * str, char const * data, i64_t const datalen ) ;
 
+void uga_str_clear   ( uga_string * str ) ;
 void uga_str_destroy ( uga_string * str ) ;
+
+void uga_str_destroy_void ( void * str ) ;
 
 
 #endif // UGA_STR_H_

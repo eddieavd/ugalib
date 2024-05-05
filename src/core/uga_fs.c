@@ -135,31 +135,27 @@ void uga_fs_close ( i32_t const file )
         }
 }
 
-u8_t * uga_fs_read_file ( char const * filepath )
+u8_t * uga_fs_read_fd ( i32_t const fd )
 {
-        i32_t file = uga_fs_open_read( filepath ) ;
-
-        if( uga_had_errs() ) return NULL ;
-
-        i64_t filesize = uga_fs_filesize_fd( file ) ;
+        i64_t filesize = uga_fs_filesize_fd( fd ) ;
 
         if( uga_had_errs() )
         {
-                uga_fs_close( file ) ;
+                uga_fs_close( fd ) ;
                 return NULL ;
         }
         u8_t * data = ( u8_t * ) uga_allocate( filesize ) ;
         if( uga_had_errs() )
         {
-                uga_fs_close( file ) ;
+                uga_fs_close( fd ) ;
                 return NULL ;
         }
-        i64_t bytes_read = read( file, data, filesize ) ;
+        i64_t bytes_read = read( fd, data, filesize ) ;
 
         if( bytes_read == -1 )
         {
                 _uga_check_std_errno() ;
-                uga_fs_close( file ) ;
+                uga_fs_close( fd ) ;
                 free( data ) ;
                 return NULL ;
         }
@@ -168,23 +164,18 @@ u8_t * uga_fs_read_file ( char const * filepath )
                 UGA_WARN_S( "uga::fs::read_file", "partial read, wanted %db, got %db", filesize, bytes_read ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_READ, filesize, bytes_read ) ;
         }
-        uga_fs_close( file ) ;
         return data ;
 }
 
-void uga_fs_read_file_into ( char const * filepath, u8_t * dest, i64_t const destlen )
+void uga_fs_read_fd_into ( i32_t const fd, u8_t * dest, i64_t const destlen )
 {
-        i32_t file = uga_fs_open_read( filepath ) ;
-
-        if( uga_had_errs() ) return ;
-
-        i64_t filesize = uga_fs_filesize_fd( file ) ;
+        i64_t filesize = uga_fs_filesize_fd( fd ) ;
 
         if( uga_had_errs() ) return ;
 
         if( filesize > destlen ) filesize = destlen ;
 
-        i64_t bytes_read = read( file, dest, filesize ) ;
+        i64_t bytes_read = read( fd, dest, filesize ) ;
         if( bytes_read == -1 )
         {
                 _uga_check_std_errno() ;
@@ -194,6 +185,23 @@ void uga_fs_read_file_into ( char const * filepath, u8_t * dest, i64_t const des
                 UGA_WARN_S( "uga::fs::read_file_into", "partial read, wanted %db, got %db", filesize, bytes_read ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_READ, filesize, bytes_read ) ;
         }
+}
+
+u8_t * uga_fs_read_file ( char const * filepath )
+{
+        i32_t file = uga_fs_open_read( filepath ) ;
+        u8_t * data = uga_fs_read_fd( file ) ;
+
+        uga_fs_close( file ) ;
+
+        return data ;
+}
+
+void uga_fs_read_file_into ( char const * filepath, u8_t * dest, i64_t const destlen )
+{
+        i32_t file = uga_fs_open_read( filepath ) ;
+
+        uga_fs_read_fd_into( file, dest, destlen ) ;
         uga_fs_close( file ) ;
 }
 

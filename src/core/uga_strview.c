@@ -36,43 +36,43 @@ uga_string_view uga_sv_create_from ( uga_string const * str )
         return view ;
 }
 
-i32_t uga_sv_equal ( uga_string_view const * lhs, uga_string_view const * rhs )
+i32_t uga_sv_equal ( uga_string_view lhs, uga_string_view rhs )
 {
-        if( lhs->size != rhs->size ) return 0 ;
+        if( lhs.size != rhs.size ) return 0 ;
 
-        if( lhs->data == rhs->data ) return 1 ;
+        if( lhs.data == rhs.data ) return 1 ;
 
-        for( i64_t i = 0; i < lhs->size; ++i )
+        for( i64_t i = 0; i < lhs.size; ++i )
         {
-                if( lhs->data[ i ] != rhs->data[ i ] ) return 0 ;
+                if( lhs.data[ i ] != rhs.data[ i ] ) return 0 ;
         }
         return 1 ;
 }
 
-i32_t uga_sv_starts_with ( uga_string_view const * this, uga_string_view const * prefix )
+i32_t uga_sv_starts_with ( uga_string_view this, uga_string_view prefix )
 {
-        if( this->size < prefix->size ) return 0 ;
+        if( this.size < prefix.size ) return 0 ;
 
-        if( this->data == prefix->data ) return 1 ;
+        if( this.data == prefix.data ) return 1 ;
 
-        for( i64_t i = 0; i < prefix->size; ++i )
+        for( i64_t i = 0; i < prefix.size; ++i )
         {
-                if( this->data[ i ] != prefix->data[ i ] ) return 0 ;
+                if( this.data[ i ] != prefix.data[ i ] ) return 0 ;
         }
         return 1 ;
 }
 
-i32_t uga_sv_ends_with ( uga_string_view const * this, uga_string_view const * suffix )
+i32_t uga_sv_ends_with ( uga_string_view this, uga_string_view suffix )
 {
-        if( this->size < suffix->size ) return 0 ;
+        if( this.size < suffix.size ) return 0 ;
 
-        i64_t start = this->size - suffix->size ;
+        i64_t start = this.size - suffix.size ;
 
-        if( this->data + start == suffix->data ) return 1 ;
+        if( this.data + start == suffix.data ) return 1 ;
 
-        for( i64_t i = 0; i < suffix->size; ++i )
+        for( i64_t i = 0; i < suffix.size; ++i )
         {
-                if( this->data[ start + i ] != suffix->data[ i ] ) return 0 ;
+                if( this.data[ start + i ] != suffix.data[ i ] ) return 0 ;
         }
         return 1 ;
 }
@@ -194,13 +194,18 @@ i64_t uga_sv_count ( uga_string_view const * this, char const val )
         return count ;
 }
 
-uga_string_view uga_sv_chop_to_delimiter ( uga_string_view * this, char const delim )
+uga_string_view uga_sv_chop_to_delimiter ( uga_string_view * this, char const delim, bool discard_delimiter )
 {
         uga_string_view chop = { this->data, 0 } ;
 
         while( !uga_sv_empty( this ) && uga_sv_front( this ) != delim )
         {
                 ++chop .size ;
+                ++this->data ;
+                --this->size ;
+        }
+        if( discard_delimiter && !uga_sv_empty( this ) )
+        {
                 ++this->data ;
                 --this->size ;
         }

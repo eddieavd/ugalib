@@ -8,6 +8,8 @@
 #define UGA_ERR_H_
 
 
+#define UGA_RETURN_ON_ERR( val ) if( uga_had_errs() ) { uga_print_error(); return val; }
+
 #include <core/uga_types.h>
 #include <core/uga_log.h>
 

@@ -31,6 +31,9 @@ i32_t uga_fs_open_full   ( char const * filepath                                
 
 void uga_fs_close ( i32_t const file ) ;
 
+u8_t * uga_fs_read_fd      ( i32_t const fd                                   ) ;
+void   uga_fs_read_fd_into ( i32_t const fd, u8_t * dest, i64_t const destlen ) ;
+
 u8_t * uga_fs_read_file      ( char const * filepath                                         ) ;
 void   uga_fs_read_file_into ( char const * filepath, u8_t       * dest, i64_t const destlen ) ;
 void   uga_fs_write_file     ( char const * filepath, u8_t const * data, i64_t const datalen ) ;

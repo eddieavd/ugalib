@@ -22,9 +22,9 @@ void  uga_reallocate ( block * mem, i64_t const bytes ) ;
 void  uga_deallocate ( block * mem                    ) ;
 */
 
-void * uga_allocate   (              i64_t const bytes ) ;
-void   uga_reallocate ( void * buff, i64_t const bytes ) ;
-void   uga_deallocate ( void * buff                    ) ;
+void * uga_allocate   (               i64_t const bytes ) ;
+void   uga_reallocate ( void ** buff, i64_t const bytes ) ;
+void   uga_deallocate ( void  * buff                    ) ;
 
 
 #endif // UGA_ALLOC_H_

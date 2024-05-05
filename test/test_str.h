@@ -45,13 +45,13 @@ static inline void test_str ( void )
 
                 uga_string copy = uga_str_copy( &src ) ;
 
-                test_log( "test::str::copy", uga_sv_equal( ( uga_string_view const * ) &src,
-                                                           ( uga_string_view const * ) &copy ) ) ;
+                test_log( "test::str::copy", uga_sv_equal( uga_sv_create_from( &src ),
+                                                           uga_sv_create_from( &copy ) ) ) ;
                 uga_string move = uga_str_move( &src ) ;
 
                 test_log( "test::str::move", uga_str_empty( &src ) ) ;
-                test_log( "test::str::move", uga_sv_equal( ( uga_string_view const * ) &copy,
-                                                           ( uga_string_view const * ) &move ) ) ;
+                test_log( "test::str::copy", uga_sv_equal( uga_sv_create_from( &copy ),
+                                                           uga_sv_create_from( &move ) ) ) ;
                 uga_str_destroy( & src ) ;
                 uga_str_destroy( &copy ) ;
                 uga_str_destroy( &move ) ;
@@ -75,8 +75,8 @@ static inline void test_str ( void )
 
                 uga_str_append_cstr( &str_0, "abcdefg" ) ;
 
-                test_log( "test::str::append_cstr", uga_sv_equal( ( uga_string_view const * ) &str_0,
-                                                                  ( uga_string_view const * ) &str_1 ) ) ;
+                test_log( "test::str::append_cstr", uga_sv_equal( uga_sv_create_from( &str_0 ),
+                                                                  uga_sv_create_from( &str_1 ) ) ) ;
                 uga_str_append( &str_1, "abc", 3 ) ;
 
                 test_log( "test::str::append", str_1.size == 10 ) ;

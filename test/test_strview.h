@@ -44,14 +44,14 @@ static inline void test_strview ( void )
                 uga_string_view suffix_0 = uga_sv_create_1( "efg" ) ;
                 uga_string_view suffix_1 = uga_sv_create_1( "def" ) ;
 
-                test_log( "test::strview::equal",  uga_sv_equal( &view_0, &view_1 ) ) ;
-                test_log( "test::strview::equal", !uga_sv_equal( &view_0, &view_2 ) ) ;
+                test_log( "test::strview::equal",  uga_sv_equal( view_0, view_1 ) ) ;
+                test_log( "test::strview::equal", !uga_sv_equal( view_0, view_2 ) ) ;
 
-                test_log( "test::strview::starts_with",  uga_sv_starts_with( &view_0, &prefix_0 ) ) ;
-                test_log( "test::strview::starts_with", !uga_sv_starts_with( &view_0, &prefix_1 ) ) ;
+                test_log( "test::strview::starts_with",  uga_sv_starts_with( view_0, prefix_0 ) ) ;
+                test_log( "test::strview::starts_with", !uga_sv_starts_with( view_0, prefix_1 ) ) ;
 
-                test_log( "test::strview::ends_with",  uga_sv_ends_with( &view_0, &suffix_0 ) ) ;
-                test_log( "test::strview::ends_with", !uga_sv_ends_with( &view_0, &suffix_1 ) ) ;
+                test_log( "test::strview::ends_with",  uga_sv_ends_with( view_0, suffix_0 ) ) ;
+                test_log( "test::strview::ends_with", !uga_sv_ends_with( view_0, suffix_1 ) ) ;
         }
         // test trim
         {
@@ -60,11 +60,11 @@ static inline void test_strview ( void )
 
                 uga_string_view trimmed = uga_sv_trimmed( &view_0 ) ;
 
-                test_log( "test::strview::trimmed", uga_sv_equal( &trimmed, &view_1 ) ) ;
+                test_log( "test::strview::trimmed", uga_sv_equal( trimmed, view_1 ) ) ;
 
                 uga_sv_trim( &view_0 ) ;
 
-                test_log( "test::strview::trim", uga_sv_equal( &view_0, &view_1 ) ) ;
+                test_log( "test::strview::trim", uga_sv_equal( view_0, view_1 ) ) ;
         }
         // test substr
         {
@@ -73,7 +73,7 @@ static inline void test_strview ( void )
 
                 uga_string_view sub = uga_sv_substr( &view_0, 4, 6 ) ;
 
-                test_log( "test::strview::substr", uga_sv_equal( &view_1, &sub ) ) ;
+                test_log( "test::strview::substr", uga_sv_equal( view_1, sub ) ) ;
         }
         // test chop and unchop
         {
@@ -84,25 +84,25 @@ static inline void test_strview ( void )
 
                 uga_string_view chop = uga_sv_chop_left( &view_0, 3 ) ;
 
-                test_log( "test::strview::chop", uga_sv_equal( &chop  , &view_2 ) ) ;
-                test_log( "test::strview::chop", uga_sv_equal( &view_0, &view_3 ) ) ;
+                test_log( "test::strview::chop", uga_sv_equal( chop  , view_2 ) ) ;
+                test_log( "test::strview::chop", uga_sv_equal( view_0, view_3 ) ) ;
 
                 uga_sv_unchop_left( &view_0, 3 ) ;
 
-                test_log( "test::strview::unchop", uga_sv_equal( &view_0, &view_1 ) ) ;
+                test_log( "test::strview::unchop", uga_sv_equal( view_0, view_1 ) ) ;
 
                 uga_string_view view_4 = uga_sv_create_1( "int a; char b;" ) ;
                 uga_string_view view_5 = uga_sv_create_1( "int a"          ) ;
 
-                uga_string_view expr = uga_sv_chop_to_delimiter( &view_4, ';' ) ;
+                uga_string_view expr = uga_sv_chop_to_delimiter( &view_4, ';', true ) ;
 
-                test_log( "test::strview::chop_to_delimiter", uga_sv_equal( &expr, &view_5 ) ) ;
+                test_log( "test::strview::chop_to_delimiter", uga_sv_equal( expr, view_5 ) ) ;
 
                 uga_string_view view_6 = uga_sv_create_1( "abcdefg" ) ;
 
-                uga_string_view chop_1 = uga_sv_chop_to_delimiter( &view_6, ';' ) ;
+                uga_string_view chop_1 = uga_sv_chop_to_delimiter( &view_6, ';', true ) ;
 
-                test_log( "test::strview::chop_to_delimiter", uga_sv_equal( &chop_1, &view_1 ) ) ;
+                test_log( "test::strview::chop_to_delimiter", uga_sv_equal( chop_1, view_1 ) ) ;
         }
         // test contains, index_of, count
         {
