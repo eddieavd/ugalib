@@ -57,14 +57,14 @@ uga_string uga_str_create_from_2 ( char const * data, i64_t const datalen )
         return str ;
 }
 
-uga_string uga_str_copy ( uga_string const * other )
+uga_string uga_str_copy ( uga_string other )
 {
-        uga_string str = uga_str_create_1( other->size ) ;
+        uga_string str = uga_str_create_1( other.size ) ;
 
         if( uga_had_errs() ) return uga_str_create_0() ;
 
-        memcpy( str.data, other->data, other->size ) ;
-        str.capacity = str.size = other->size ;
+        memcpy( str.data, other.data, other.size ) ;
+        str.capacity = str.size = other.size ;
 
         return str ;
 }
@@ -84,24 +84,24 @@ uga_string uga_str_move ( uga_string * other )
         return str ;
 }
 
-char       * uga_str_data  ( uga_string       * str ) { return str->data ; }
-char const * uga_str_cdata ( uga_string const * str ) { return str->data ; }
+char       * uga_str_data  ( uga_string * str ) { return str->data ; }
+char const * uga_str_cdata ( uga_string   str ) { return str. data ; }
 
-i64_t uga_str_size     ( uga_string const * str ) { return str->      size ; }
-i64_t uga_str_capacity ( uga_string const * str ) { return str->  capacity ; }
-bool  uga_str_empty    ( uga_string const * str ) { return str->size == 0  ; }
+i64_t uga_str_size     ( uga_string str ) { return str.      size ; }
+i64_t uga_str_capacity ( uga_string str ) { return str.  capacity ; }
+bool  uga_str_empty    ( uga_string str ) { return str.size == 0  ; }
 
-i64_t uga_str_space_left ( uga_string const * str ) { return str->capacity - str->size ; }
+i64_t uga_str_space_left ( uga_string str ) { return str.capacity - str.size ; }
 
-char uga_str_at ( uga_string const * str, i64_t const pos )
+char uga_str_at ( uga_string str, i64_t const pos )
 {
-        if( pos >= str->size )
+        if( pos >= str.size )
         {
                 UGA_ERR_S( "uga::str::at", "index out of bounds" ) ;
-                uga_set_mem_error( UGA_ERR_BAD_ACCESS, str->size, pos ) ;
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, str.size, pos ) ;
                 return -1 ;
         }
-        return str->data[ pos ] ;
+        return str.data[ pos ] ;
 }
 
 void uga_str_reserve ( uga_string * str, i64_t const capacity )
@@ -132,9 +132,9 @@ void uga_str_shrink_to_fit ( uga_string * str )
         str->capacity = str->size ;
 }
 
-void uga_str_append_str ( uga_string * str, uga_string const * other )
+void uga_str_append_str ( uga_string * str, uga_string other )
 {
-        uga_str_append( str, other->data, other->size ) ;
+        uga_str_append( str, other.data, other.size ) ;
 }
 
 void uga_str_append_cstr ( uga_string * str, char const * cstr )
@@ -144,14 +144,14 @@ void uga_str_append_cstr ( uga_string * str, char const * cstr )
 
 void uga_str_push_back ( uga_string * str, char const val )
 {
-        if( uga_str_empty( str ) )
+        if( uga_str_empty( *str ) )
         {
                 *str = uga_str_create_1( 1 ) ;
                 str->size = 1 ;
                 str->data[ 0 ] = val ;
                 return ;
         }
-        if( uga_str_space_left( str ) == 0 )
+        if( uga_str_space_left( *str ) == 0 )
         {
                 uga_str_reserve( str, str->size + 1 ) ;
         }
@@ -160,12 +160,12 @@ void uga_str_push_back ( uga_string * str, char const val )
 
 void uga_str_append ( uga_string * str, char const * data, i64_t const datalen )
 {
-        if( uga_str_empty( str ) )
+        if( uga_str_empty( *str ) )
         {
                 *str = uga_str_create_from_2( data, datalen ) ;
                 return ;
         }
-        else if( uga_str_space_left( str ) >= datalen )
+        else if( uga_str_space_left( *str ) >= datalen )
         {
                 memcpy( str->data + str->size, data, datalen ) ;
                 str->size += datalen ;

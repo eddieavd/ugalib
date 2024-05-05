@@ -58,7 +58,7 @@ static inline void test_strview ( void )
                 uga_string_view view_0 = uga_sv_create_1( "  abc " ) ;
                 uga_string_view view_1 = uga_sv_create_1(   "abc"  ) ;
 
-                uga_string_view trimmed = uga_sv_trimmed( &view_0 ) ;
+                uga_string_view trimmed = uga_sv_trimmed( view_0 ) ;
 
                 test_log( "test::strview::trimmed", uga_sv_equal( trimmed, view_1 ) ) ;
 
@@ -71,7 +71,7 @@ static inline void test_strview ( void )
                 uga_string_view view_0 = uga_sv_create_1( "somestringdata" ) ;
                 uga_string_view view_1 = uga_sv_create_1(     "string"     ) ;
 
-                uga_string_view sub = uga_sv_substr( &view_0, 4, 6 ) ;
+                uga_string_view sub = uga_sv_substr( view_0, 4, 6 ) ;
 
                 test_log( "test::strview::substr", uga_sv_equal( view_1, sub ) ) ;
         }
@@ -108,19 +108,19 @@ static inline void test_strview ( void )
         {
                 uga_string_view view_0 = uga_sv_create_1( "abcdabcdab " ) ;
 
-                test_log( "test::strview::contains",  uga_sv_contains( &view_0,  'a' ) ) ;
-                test_log( "test::strview::contains",  uga_sv_contains( &view_0,  'd' ) ) ;
-                test_log( "test::strview::contains",  uga_sv_contains( &view_0,  ' ' ) ) ;
-                test_log( "test::strview::contains", !uga_sv_contains( &view_0,  'e' ) ) ;
-                test_log( "test::strview::contains", !uga_sv_contains( &view_0, '\t' ) ) ;
+                test_log( "test::strview::contains",  uga_sv_contains( view_0,  'a' ) ) ;
+                test_log( "test::strview::contains",  uga_sv_contains( view_0,  'd' ) ) ;
+                test_log( "test::strview::contains",  uga_sv_contains( view_0,  ' ' ) ) ;
+                test_log( "test::strview::contains", !uga_sv_contains( view_0,  'e' ) ) ;
+                test_log( "test::strview::contains", !uga_sv_contains( view_0, '\t' ) ) ;
 
-                test_log( "test::strview::index_of", uga_sv_index_of( &view_0, 'c' ) == 2 ) ;
-                test_log( "test::strview::index_of", uga_sv_index_of( &view_0, ' ' ) == view_0.size - 1 ) ;
-                test_log( "test::strview::index_of", uga_sv_index_of( &view_0, 'z' ) == view_0.size ) ;
+                test_log( "test::strview::index_of", uga_sv_index_of( view_0, 'c' ) == 2 ) ;
+                test_log( "test::strview::index_of", uga_sv_index_of( view_0, ' ' ) == view_0.size - 1 ) ;
+                test_log( "test::strview::index_of", uga_sv_index_of( view_0, 'z' ) == view_0.size ) ;
 
-                test_log( "test::strview::count", uga_sv_count( &view_0, 'a' ) == 3 ) ;
-                test_log( "test::strview::count", uga_sv_count( &view_0, 'd' ) == 2 ) ;
-                test_log( "test::strview::count", uga_sv_count( &view_0, 'z' ) == 0 ) ;
+                test_log( "test::strview::count", uga_sv_count( view_0, 'a' ) == 3 ) ;
+                test_log( "test::strview::count", uga_sv_count( view_0, 'd' ) == 2 ) ;
+                test_log( "test::strview::count", uga_sv_count( view_0, 'z' ) == 0 ) ;
         }
         // test parse
         {
@@ -131,25 +131,25 @@ static inline void test_strview ( void )
                 i64_t val_pos =  1234 ;
                 i64_t val_neg = -1234 ;
 
-                test_log( "test::strview::parse_int", uga_sv_parse_int( &view_0 ) == val_pos ) ;
-                test_log( "test::strview::parse_int", uga_sv_parse_int( &view_1 ) == val_pos ) ;
-                test_log( "test::strview::parse_int", uga_sv_parse_int( &view_2 ) == val_neg ) ;
+                test_log( "test::strview::parse_int", uga_sv_parse_int( view_0 ) == val_pos ) ;
+                test_log( "test::strview::parse_int", uga_sv_parse_int( view_1 ) == val_pos ) ;
+                test_log( "test::strview::parse_int", uga_sv_parse_int( view_2 ) == val_neg ) ;
         }
         // test access
         {
                 uga_string_view view_e = uga_sv_create_0() ;
                 uga_string_view view_0 = uga_sv_create_1( "abcdefgabcdefg" ) ;
 
-                test_log( "test::strview::empty",  uga_sv_empty( &view_e ) ) ;
-                test_log( "test::strview::empty", !uga_sv_empty( &view_0 ) ) ;
+                test_log( "test::strview::empty",  uga_sv_empty( view_e ) ) ;
+                test_log( "test::strview::empty", !uga_sv_empty( view_0 ) ) ;
 
-                test_log( "test::strview::at", uga_sv_at( &view_0, 0 ) == 'a' ) ;
-                test_log( "test::strview::at", uga_sv_at( &view_0, 4 ) == 'e' ) ;
-                test_log( "test::strview::at", uga_sv_at( &view_0, view_0.size - 1 ) == 'g' ) ;
+                test_log( "test::strview::at", uga_sv_at( view_0, 0 ) == 'a' ) ;
+                test_log( "test::strview::at", uga_sv_at( view_0, 4 ) == 'e' ) ;
+                test_log( "test::strview::at", uga_sv_at( view_0, view_0.size - 1 ) == 'g' ) ;
 
-                test_log( "test::strview::front", uga_sv_front( &view_0 ) == 'a' ) ;
+                test_log( "test::strview::front", uga_sv_front( view_0 ) == 'a' ) ;
 
-                test_log( "test::strview::back", uga_sv_back( &view_0 ) == 'g' ) ;
+                test_log( "test::strview::back", uga_sv_back( view_0 ) == 'g' ) ;
         }
 }
 

@@ -43,13 +43,13 @@ static inline void test_str ( void )
         {
                 uga_string src = uga_str_create_from_1( "string" ) ;
 
-                uga_string copy = uga_str_copy( &src ) ;
+                uga_string copy = uga_str_copy( src ) ;
 
                 test_log( "test::str::copy", uga_sv_equal( uga_sv_create_from( &src ),
                                                            uga_sv_create_from( &copy ) ) ) ;
                 uga_string move = uga_str_move( &src ) ;
 
-                test_log( "test::str::move", uga_str_empty( &src ) ) ;
+                test_log( "test::str::move", uga_str_empty( src ) ) ;
                 test_log( "test::str::copy", uga_sv_equal( uga_sv_create_from( &copy ),
                                                            uga_sv_create_from( &move ) ) ) ;
                 uga_str_destroy( & src ) ;

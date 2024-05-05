@@ -24,7 +24,7 @@ int main ( void )
 
         for( i32_t i = 0; i < 10; ++i )
         {
-                *( ( uga_string * ) _uga_vec_at( &vec, i ) ) = uga_str_copy( &str ) ;
+                *( ( uga_string * ) _uga_vec_at( &vec, i ) ) = uga_str_copy( str ) ;
                 ++vec.size ;
                 uga_print_abort_if_err() ;
         }

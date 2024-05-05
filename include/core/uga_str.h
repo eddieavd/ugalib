@@ -29,25 +29,25 @@ uga_string uga_str_create_1 ( i64_t const capacity ) ;
 uga_string uga_str_create_from_1 ( char const * cstr                      ) ;
 uga_string uga_str_create_from_2 ( char const * data, i64_t const datalen ) ;
 
-uga_string uga_str_copy ( uga_string const * other ) ;
-uga_string uga_str_move ( uga_string       * other ) ;
+uga_string uga_str_copy ( uga_string   other ) ;
+uga_string uga_str_move ( uga_string * other ) ;
 
-char       * uga_str_data  ( uga_string       * str ) ;
-char const * uga_str_cdata ( uga_string const * str ) ;
+char       * uga_str_data  ( uga_string * str ) ;
+char const * uga_str_cdata ( uga_string   str ) ;
 
-i64_t uga_str_size     ( uga_string const * str ) ;
-i64_t uga_str_capacity ( uga_string const * str ) ;
-bool  uga_str_empty    ( uga_string const * str ) ;
+i64_t uga_str_size     ( uga_string str ) ;
+i64_t uga_str_capacity ( uga_string str ) ;
+bool  uga_str_empty    ( uga_string str ) ;
 
-char uga_str_at ( uga_string const * str, i64_t const pos ) ;
+char uga_str_at ( uga_string str, i64_t const pos ) ;
 
-i64_t uga_str_space_left ( uga_string const * str ) ;
+i64_t uga_str_space_left ( uga_string str ) ;
 
 void uga_str_reserve ( uga_string * str, i64_t const capacity ) ;
 
 void uga_str_shrink_to_fit ( uga_string * str ) ;
 
-void uga_str_append_str ( uga_string * str, uga_string const * other ) ;
+void uga_str_append_str ( uga_string * str, uga_string other ) ;
 
 void uga_str_append_cstr ( uga_string * str, char const * cstr ) ;
 
