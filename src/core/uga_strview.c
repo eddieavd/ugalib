@@ -85,7 +85,7 @@ void uga_sv_trim ( uga_string_view * this )
 
 void uga_sv_trim_left ( uga_string_view * this )
 {
-        while( !uga_sv_empty( this ) && ( uga_sv_front( this ) == ' ' || uga_sv_front( this ) == '\t' ) )
+        while( !uga_sv_empty( *this ) && ( uga_sv_front( *this ) == ' ' || uga_sv_front( *this ) == '\t' ) )
         {
                 ++this->data ;
                 --this->size ;
@@ -94,38 +94,38 @@ void uga_sv_trim_left ( uga_string_view * this )
 
 void uga_sv_trim_right ( uga_string_view * this )
 {
-        while( !uga_sv_empty( this ) && ( uga_sv_back( this ) == ' ' || uga_sv_back( this ) == '\t' ) )
+        while( !uga_sv_empty( *this ) && ( uga_sv_back( *this ) == ' ' || uga_sv_back( *this ) == '\t' ) )
         {
                 --this->size ;
         }
 }
 
-uga_string_view uga_sv_trimmed ( uga_string_view const * this )
+uga_string_view uga_sv_trimmed ( uga_string_view this )
 {
-        uga_string_view view = *this ;
+        uga_string_view view = this ;
         uga_sv_trim( &view ) ;
         return view ;
 }
 
-uga_string_view uga_sv_trimmed_left ( uga_string_view const * this )
+uga_string_view uga_sv_trimmed_left ( uga_string_view this )
 {
-        uga_string_view view = *this ;
+        uga_string_view view = this ;
         uga_sv_trim_left( &view ) ;
         return view ;
 }
 
-uga_string_view uga_sv_trimmed_right ( uga_string_view const * this )
+uga_string_view uga_sv_trimmed_right ( uga_string_view this )
 {
-        uga_string_view view = *this ;
+        uga_string_view view = this ;
         uga_sv_trim_right( &view ) ;
         return view ;
 }
 
-uga_string_view uga_sv_substr ( uga_string_view const * this, i64_t const start, i64_t const len )
+uga_string_view uga_sv_substr ( uga_string_view this, i64_t const start, i64_t const len )
 {
-        if( start >= this->size || start + len >= this->size ) return uga_sv_create_0() ;
+        if( start >= this.size || start + len >= this.size ) return uga_sv_create_0() ;
 
-        return uga_sv_create_2( this->data + start, len ) ;
+        return uga_sv_create_2( this.data + start, len ) ;
 }
 
 uga_string_view uga_sv_chop_left ( uga_string_view * this, i64_t count )
@@ -153,7 +153,7 @@ uga_string_view uga_sv_chop_right ( uga_string_view * this, i64_t count )
 
 void uga_sv_unchop_left ( uga_string_view * this, i64_t count )
 {
-        if( uga_sv_empty( this ) ) return ;
+        if( uga_sv_empty( *this ) ) return ;
 
         this->data -= count ;
         this->size += count ;
@@ -161,33 +161,33 @@ void uga_sv_unchop_left ( uga_string_view * this, i64_t count )
 
 void uga_sv_unchop_right ( uga_string_view * this, i64_t count )
 {
-        if( uga_sv_empty( this ) ) return ;
+        if( uga_sv_empty( *this ) ) return ;
 
         this->size += count ;
 }
 
-i32_t uga_sv_contains ( uga_string_view const * this, char const val )
+i32_t uga_sv_contains ( uga_string_view this, char const val )
 {
-        for( i64_t i = 0; i < this->size; ++i )
+        for( i64_t i = 0; i < this.size; ++i )
         {
                 if( uga_sv_at( this, i ) == val ) return 1 ;
         }
         return 0 ;
 }
 
-i64_t uga_sv_index_of ( uga_string_view const * this, char const val )
+i64_t uga_sv_index_of ( uga_string_view this, char const val )
 {
-        for( i64_t i = 0; i < this->size; ++i )
+        for( i64_t i = 0; i < this.size; ++i )
         {
                 if( uga_sv_at( this, i ) == val ) return i ;
         }
-        return this->size ;
+        return this.size ;
 }
 
-i64_t uga_sv_count ( uga_string_view const * this, char const val )
+i64_t uga_sv_count ( uga_string_view this, char const val )
 {
         i64_t count = 0 ;
-        for( i64_t i = 0; i < this->size; ++i )
+        for( i64_t i = 0; i < this.size; ++i )
         {
                 if( uga_sv_at( this, i ) == val ) ++count ;
         }
@@ -198,13 +198,13 @@ uga_string_view uga_sv_chop_to_delimiter ( uga_string_view * this, char const de
 {
         uga_string_view chop = { this->data, 0 } ;
 
-        while( !uga_sv_empty( this ) && uga_sv_front( this ) != delim )
+        while( !uga_sv_empty( *this ) && uga_sv_front( *this ) != delim )
         {
                 ++chop .size ;
                 ++this->data ;
                 --this->size ;
         }
-        if( discard_delimiter && !uga_sv_empty( this ) )
+        if( discard_delimiter && !uga_sv_empty( *this ) )
         {
                 ++this->data ;
                 --this->size ;
@@ -212,24 +212,24 @@ uga_string_view uga_sv_chop_to_delimiter ( uga_string_view * this, char const de
         return chop ;
 }
 
-i64_t uga_sv_parse_int ( uga_string_view const * this )
+i64_t uga_sv_parse_int ( uga_string_view this )
 {
         uga_string_view digits = uga_sv_trimmed( this ) ;
 
-        if( uga_sv_empty( &digits ) ) return 0 ;
+        if( uga_sv_empty( digits ) ) return 0 ;
 
         i32_t sign = 1 ;
         i64_t pos  = 0 ;
 
-        if( uga_sv_front( &digits ) == '+' || uga_sv_front( &digits ) == '-' )
+        if( uga_sv_front( digits ) == '+' || uga_sv_front( digits ) == '-' )
         {
-                sign = ( uga_sv_front( &digits ) == '-' ) ? -1 : 1 ;
+                sign = ( uga_sv_front( digits ) == '-' ) ? -1 : 1 ;
                 ++pos ;
         }
         i64_t val = 0 ;
         for( ; pos < digits.size; ++pos )
         {
-                char chr = uga_sv_at( &digits, pos ) ;
+                char chr = uga_sv_at( digits, pos ) ;
                 if( chr < '0' || chr > '9' ) break ;
 
                 val = val * 10 + ( chr - '0' ) ;
@@ -237,23 +237,23 @@ i64_t uga_sv_parse_int ( uga_string_view const * this )
         return sign * val ;
 }
 
-char uga_sv_at ( uga_string_view const * this, i64_t const index )
+char uga_sv_at ( uga_string_view this, i64_t const index )
 {
         uga_clr_errs() ;
-        if( index >= this->size )
+        if( index >= this.size )
         {
-                uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, this.size, index ) ;
                 return '\0' ;
         }
-        return this->data[ index ] ;
+        return this.data[ index ] ;
 }
 
-i32_t uga_sv_empty ( uga_string_view const * this )
+i32_t uga_sv_empty ( uga_string_view this )
 {
-        return ( !this->data || !this->size ) ;
+        return ( !this.data || !this.size ) ;
 }
 
-char uga_sv_front ( uga_string_view const * this )
+char uga_sv_front ( uga_string_view this )
 {
         uga_clr_errs() ;
         if( uga_sv_empty( this ) )
@@ -261,15 +261,15 @@ char uga_sv_front ( uga_string_view const * this )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, 0, 1 ) ;
                 return '\0' ;
         }
-        return this->data[ 0 ] ;
+        return this.data[ 0 ] ;
 }
 
-char uga_sv_back ( uga_string_view const * this )
+char uga_sv_back ( uga_string_view this )
 {
         uga_clr_errs() ;
         if( uga_sv_empty( this ) )
         {
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, 0, 1 ) ;
         }
-        return this->data[ this->size - 1 ] ;
+        return this.data[ this.size - 1 ] ;
 }
