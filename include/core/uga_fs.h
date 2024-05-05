@@ -38,9 +38,10 @@ void uga_fs_close ( i32_t const file ) ;
 i64_t uga_fs_read_fd   ( i32_t const fd, uga_string    * dest ) ;
 i64_t uga_fs_write_fd  ( i32_t const fd, uga_string_view data ) ;
 
-uga_string uga_fs_read_file   ( uga_string_view filename                       ) ;
-i64_t      uga_fs_write_file  ( uga_string_view filename, uga_string_view data ) ;
-i64_t      uga_fs_append_file ( uga_string_view filename, uga_string_view data ) ;
+uga_string uga_fs_read_file      ( uga_string_view filename                       ) ;
+i64_t      uga_fs_read_file_into ( uga_string_view filename, uga_string    * dest ) ;
+i64_t      uga_fs_write_file     ( uga_string_view filename, uga_string_view data ) ;
+i64_t      uga_fs_append_file    ( uga_string_view filename, uga_string_view data ) ;
 
 
 #endif // UGA_FS_H_

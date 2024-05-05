@@ -49,17 +49,15 @@ int main ( int argc, char ** argv )
                 print_help() ;
                 return 1 ;
         }
-        char const * tcp_port = uga_cli_get_val( CLI_TCP, &args ) ;
-        char const * udp_port = uga_cli_get_val( CLI_UDP, &args ) ;
-
-        uga_string payloads = uga_str_create_from_1( uga_cli_get_val( CLI_PLD, &args ) ) ;
-        uga_print_abort_if_err() ;
+        uga_string_view tcp_port =       uga_sv_create_1( uga_cli_get_val( CLI_TCP, &args ) ) ;
+        uga_string_view udp_port =       uga_sv_create_1( uga_cli_get_val( CLI_UDP, &args ) ) ;
+        uga_string      payloads = uga_str_create_from_1( uga_cli_get_val( CLI_PLD, &args ) ) ;
 
         UGA_INFO_S( "lab2::server", "config: tcp port : %s, udp port : %s, payloads : "STR_FMT, tcp_port, udp_port, STR_ARG( payloads ) ) ;
 
         uga_socket tcp_sock = uga_sock_create_and_listen_configured( tcp_port, 16, &tcp_config ) ;
         uga_print_abort_if_err() ;
-        uga_socket udp_sock = uga_sock_create_and_bind_configured( "127.0.0.1", udp_port, &udp_config ) ;
+        uga_socket udp_sock = uga_sock_create_and_bind_configured( uga_sv_create_1( "127.0.0.1" ), udp_port, &udp_config ) ;
         uga_print_abort_if_err() ;
         uga_socket std_sock = { 0 } ;
         std_sock.sockfd = fileno( stdin ) ;
@@ -75,17 +73,16 @@ int main ( int argc, char ** argv )
 
         uga_handler_list handlers = { 0 } ;
 
+        UGA_INFO_S( "lab2::server", "adding callbacks to multiplexer..." ) ;
+
         uga_mplex_add_handler( &handlers, &tcp_cb_data ) ;
         uga_mplex_add_handler( &handlers, &udp_cb_data ) ;
         uga_mplex_add_handler( &handlers, &std_cb_data ) ;
 
-        UGA_INFO_S( "lab2::server", "added callbacks to multiplexer" ) ;
         UGA_INFO_S( "lab2::server", "starting multiplexer..." ) ;
 
-        i32_t ret = uga_mplex_run( &handlers ) ;
 
-
-        return ret ;
+        return uga_mplex_run( &handlers ) ;
 }
 
 bool tcp_callback ( uga_callback * callback_data )
@@ -137,11 +134,8 @@ bool std_callback ( uga_callback * callback_data )
         uga_socket *     sock = callback_data->sock ;
         uga_string * payloads = callback_data->data ;
 
-        uga_string command = uga_str_create_1( 1024 ) ;
-
-//      uga_fs_read_fd_into( sock->sockfd, ( u8_t * ) command.data, command.capacity ) ;
-        i32_t bread = read( sock->sockfd, command.data, command.capacity ) ;
-        command.size = bread ;
+        uga_string command = uga_str_create_1( 2048 ) ;
+        uga_fs_read_fd( sock->sockfd, &command ) ;
 
         uga_string_view command_view = uga_sv_create_from( &command ) ;
 

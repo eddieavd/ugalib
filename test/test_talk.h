@@ -18,7 +18,7 @@
 
 static inline void test_client_1 ( void )
 {
-        uga_socket sock = uga_sock_create_and_listen( "8372", 10 ) ;
+        uga_socket sock = uga_sock_create_and_listen( uga_sv_create_1( "8372" ), 10 ) ;
         uga_print_abort_if_err() ;
         UGA_INFO_S( "test::talk::client_1", "socket created and listening..." ) ;
 
@@ -40,7 +40,7 @@ static inline void test_client_2 ( void )
 {
         sleep( 1 ) ;
 
-        uga_socket sock = uga_sock_create_and_connect( "127.0.0.1", "8372" ) ;
+        uga_socket sock = uga_sock_create_and_connect( uga_sv_create_1( "127.0.0.1" ), uga_sv_create_1( "8372" ) ) ;
         uga_print_abort_if_err() ;
         UGA_INFO_S( "test::talk::client_2", "socket created and connected." ) ;
 

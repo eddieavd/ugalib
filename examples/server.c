@@ -20,7 +20,7 @@ int main ( int argc, char ** argv )
                 UGA_ERR_S( "uga::demo::server", "usage: ./server <port>" ) ;
                 return 1 ;
         }
-        char const * port = argv[ 1 ] ;
+        uga_string_view port = uga_sv_create_1( argv[ 1 ] ) ;
 
         uga_socket sock = uga_sock_create_and_listen( port, 12 ) ;
         uga_print_abort_if_err() ;

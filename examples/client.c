@@ -8,7 +8,6 @@
 
 #include <uganet.h>
 
-#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -33,12 +32,12 @@ int main ( int argc, char ** argv )
         uga_cli_args args = prepare_args() ;
         uga_cli_parse_args( argc, argv, &args ) ;
 
-        char const * port = uga_cli_get_val( CLI_PORT, &args ) ;
+        uga_string_view port = uga_sv_create_1( uga_cli_get_val( CLI_PORT, &args ) ) ;
         char const * msg  = uga_cli_get_val( CLI_MSG , &args ) ;
 
         UGA_INFO_S( "uga::demo::client", "creating and connecting socket..." ) ;
 
-        uga_socket sock = uga_sock_create_and_connect( NULL, port ) ;
+        uga_socket sock = uga_sock_create_and_connect( uga_sv_create_0(), port ) ;
         uga_print_abort_if_err() ;
 
         UGA_INFO_S( "uga::demo::client", "connection established." );

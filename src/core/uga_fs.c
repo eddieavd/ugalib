@@ -154,6 +154,7 @@ i64_t uga_fs_read_fd ( i32_t const fd, uga_string * dest )
                 UGA_WARN_S( "uga::fs::read_fd", "partial read, wanted %db, got %db", dest->capacity, bytes_read ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_READ, dest->capacity, bytes_read ) ;
         }
+        dest->size = bytes_read ;
         return bytes_read ;
 }
 
@@ -188,9 +189,18 @@ uga_string uga_fs_read_file ( uga_string_view filename )
         return data ;
 }
 
+i64_t uga_fs_read_file_into ( uga_string_view filename, uga_string * dest )
+{
+        i32_t fd = uga_fs_open_read( filename ) ;
+        UGA_RETURN_ON_ERR( -1 ) ;
+
+        return uga_fs_read_fd( fd, dest ) ;
+}
+
 i64_t uga_fs_write_file ( uga_string_view filename, uga_string_view data )
 {
         i32_t fd = uga_fs_open_write( filename ) ;
+        UGA_RETURN_ON_ERR( -1 ) ;
 
         return uga_fs_write_fd( fd, data ) ;
 }
@@ -198,6 +208,7 @@ i64_t uga_fs_write_file ( uga_string_view filename, uga_string_view data )
 i64_t uga_fs_append_file ( uga_string_view filename, uga_string_view data )
 {
         i32_t fd = uga_fs_open_append( filename ) ;
+        UGA_RETURN_ON_ERR( -1 ) ;
 
         return uga_fs_write_fd( fd, data ) ;
 }

@@ -49,8 +49,8 @@ int main ( int argc, char ** argv )
                 print_help() ;
                 return 1 ;
         }
-        char const *   ip = argv[ 1 ] ;
-        char const * port = argv[ 2 ] ;
+        uga_string_view   ip = uga_sv_create_1( argv[ 1 ] ) ;
+        uga_string_view port = uga_sv_create_1( argv[ 2 ] ) ;
 
         UGA_INFO_S( "lab2::bot", "cnc config: ip: %s, port: %s", ip, port ) ;
 
@@ -100,7 +100,11 @@ fin:
 
 void do_prog ( message_t const * command, uga_string * payload, uga_sock_conf const * config )
 {
-        uga_socket serv_sock = uga_sock_create_and_connect_configured( command->endpoints[ 0 ].ip, command->endpoints[ 0 ].port, config ) ;
+        uga_socket serv_sock = uga_sock_create_and_connect_configured(
+                                        uga_sv_create_1( command->endpoints[ 0 ].  ip ),
+                                        uga_sv_create_1( command->endpoints[ 0 ].port ),
+                                        config
+        ) ;
         UGA_RETURN_ON_ERR() ;
         UGA_INFO_S( "lab2::bot::do_prog", "connected to server" ) ;
 
