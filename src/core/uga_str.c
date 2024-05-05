@@ -103,6 +103,15 @@ bool  uga_str_empty    ( uga_string str ) { return str.size == 0  ; }
 
 i64_t uga_str_space_left ( uga_string str ) { return str.capacity - str.size ; }
 
+void uga_str_check_size ( uga_string * str )
+{
+        str->size = 0 ;
+        while( str->data[ str->size ] != '\0' )
+        {
+                ++str->size ;
+        }
+}
+
 char uga_str_at ( uga_string str, i64_t const pos )
 {
         if( pos >= str.size )

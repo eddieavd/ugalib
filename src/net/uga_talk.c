@@ -14,7 +14,7 @@
 #define UGA_RECV_BUFF_SIZE 4096
 
 
-void uga_send ( uga_socket const * sock, void const * data, i64_t const datalen, i32_t const flags )
+i64_t uga_send ( uga_socket const * sock, void const * data, i64_t const datalen, i32_t const flags )
 {
         uga_clr_errs() ;
 
@@ -28,9 +28,10 @@ void uga_send ( uga_socket const * sock, void const * data, i64_t const datalen,
                 UGA_WARN_S( "uga::talk::send", "partial write, wanted %db, sent %db", datalen, bytes_sent ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_WRITE, datalen, bytes_sent ) ;
         }
+        return bytes_sent ;
 }
 
-void uga_send_to ( uga_socket const * sock, void const * data, i64_t const datalen, i32_t const flags )
+i64_t uga_send_to ( uga_socket const * sock, void const * data, i64_t const datalen, i32_t const flags )
 {
         uga_clr_errs() ;
 
@@ -44,16 +45,17 @@ void uga_send_to ( uga_socket const * sock, void const * data, i64_t const datal
                 UGA_WARN_S( "uga::talk::send_to", "partial write, wanted %db, sent %db", datalen, bytes_sent ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_WRITE, datalen, bytes_sent ) ;
         }
+        return bytes_sent ;
 }
 
-void uga_send_str ( uga_socket const * sock, uga_string const * message, i32_t const flags )
+i64_t uga_send_str ( uga_socket const * sock, uga_string const * message, i32_t const flags )
 {
-        uga_send( sock, message->data, message->size, flags ) ;
+        return uga_send( sock, message->data, message->size, flags ) ;
 }
 
-void uga_send_str_to ( uga_socket const * sock, uga_string const * message, i32_t const flags )
+i64_t uga_send_str_to ( uga_socket const * sock, uga_string const * message, i32_t const flags )
 {
-        uga_send_to( sock, message->data, message->size, flags ) ;
+        return uga_send_to( sock, message->data, message->size, flags ) ;
 }
 
 i64_t uga_recv ( uga_socket const * sock, void * dest, i64_t const destlen, i32_t const flags )

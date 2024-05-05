@@ -48,6 +48,8 @@ char uga_str_at ( uga_string str, i64_t const pos ) ;
 
 i64_t uga_str_space_left ( uga_string str ) ;
 
+void uga_str_check_size ( uga_string * str ) ;
+
 void uga_str_reserve ( uga_string * str, i64_t const capacity ) ;
 
 void uga_str_shrink_to_fit ( uga_string * str ) ;

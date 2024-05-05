@@ -8,6 +8,8 @@
 #define UGA_SOCK_H_
 
 #include <core/uga_types.h>
+#include <core/uga_str.h>
+#include <core/uga_strview.h>
 
 #include <netdb.h>
 
@@ -124,53 +126,53 @@ void uga_sock_set_ttl ( uga_socket * sock, char const * ttl ) ;
 /// ip <-> str
 ////////////////////////////////////////////////////////////////////////////////
 
-uga_sockaddr_ipv4 uga_ipv4_from_str ( char const * ip ) ;
-uga_sockaddr_ipv6 uga_ipv6_from_str ( char const * ip ) ;
+uga_sockaddr_ipv4 uga_ipv4_from_str ( uga_string_view ip ) ;
+uga_sockaddr_ipv6 uga_ipv6_from_str ( uga_string_view ip ) ;
 
-void uga_ipv4_to_str ( uga_sockaddr_ipv4 const * ip, char * dest ) ;
-void uga_ipv6_to_str ( uga_sockaddr_ipv6 const * ip, char * dest ) ;
+uga_string uga_ipv4_to_str ( uga_sockaddr_ipv4 const * ip ) ;
+uga_string uga_ipv6_to_str ( uga_sockaddr_ipv6 const * ip ) ;
 
-void uga_ip_to_str ( uga_addrinfo const * addr, char * dest ) ;
+uga_string uga_ip_to_str ( uga_addrinfo const * addr ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// addrinfo
 ////////////////////////////////////////////////////////////////////////////////
 
-uga_addrinfo uga_addrinfo_local_configured ( char const * service, uga_sock_conf const * conf ) ;
+uga_addrinfo uga_addrinfo_local_configured ( uga_string_view service, uga_sock_conf const * conf ) ;
 
-uga_addrinfo  uga_addrinfo_get_configured ( char const * node, char const * service, uga_sock_conf const * conf ) ;
-_addrinfo_t * uga_addrinfo_raw_configured ( char const * node, char const * service, uga_sock_conf const * conf ) ;
+uga_addrinfo  uga_addrinfo_get_configured ( uga_string_view node, uga_string_view service, uga_sock_conf const * conf ) ;
+_addrinfo_t * uga_addrinfo_raw_configured ( uga_string_view node, uga_string_view service, uga_sock_conf const * conf ) ;
 
-uga_addrinfo uga_addrinfo_local ( char const * service ) ;
+uga_addrinfo uga_addrinfo_local ( uga_string_view service ) ;
 
-uga_addrinfo  uga_addrinfo_get ( char const * node, char const * service ) ;
-_addrinfo_t * uga_addrinfo_raw ( char const * node, char const * service ) ;
+uga_addrinfo  uga_addrinfo_get ( uga_string_view node, uga_string_view service ) ;
+_addrinfo_t * uga_addrinfo_raw ( uga_string_view node, uga_string_view service ) ;
 
 uga_addrinfo uga_addrinfo_from_sockaddr ( uga_sockaddr_storage const sockaddr ) ;
 
-void uga_get_ip_str ( char const * node, char const * service, char * dest ) ;
+uga_string uga_get_ip_str ( uga_string_view node, uga_string_view service ) ;
 
-void uga_lookup_configured         ( char const * host, char const * service, char *   ip, u16_t *    port, uga_sock_conf const * conf ) ;
-void uga_reverse_lookup_configured ( char const *   ip, char const *    port, char * host, char  * service, uga_sock_conf const * conf ) ;
+void uga_lookup_configured         ( uga_string_view host, uga_string_view service, char *   ip, u16_t *    port, uga_sock_conf const * conf ) ;
+void uga_reverse_lookup_configured ( uga_string_view   ip, uga_string_view    port, char * host, char  * service, uga_sock_conf const * conf ) ;
 
-void uga_lookup         ( char const * host, char const * service, char *   ip, u16_t *    port ) ;
-void uga_reverse_lookup ( char const *   ip, char const *    port, char * host, char  * service ) ;
+void uga_lookup         ( uga_string_view host, uga_string_view service, char *   ip, u16_t *    port ) ;
+void uga_reverse_lookup ( uga_string_view   ip, uga_string_view    port, char * host, char  * service ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// socket
 ////////////////////////////////////////////////////////////////////////////////
 
-uga_socket uga_sock_create_configured             ( char const * host, char const * service, uga_sock_conf const * conf ) ;
-uga_socket uga_sock_create_and_bind_configured    ( char const * host, char const * service, uga_sock_conf const * conf ) ;
-uga_socket uga_sock_create_and_connect_configured ( char const * host, char const * service, uga_sock_conf const * conf ) ;
+uga_socket uga_sock_create_configured             ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf ) ;
+uga_socket uga_sock_create_and_bind_configured    ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf ) ;
+uga_socket uga_sock_create_and_connect_configured ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf ) ;
 
-uga_socket uga_sock_create_and_listen_configured ( char const * service, i32_t const backlog, uga_sock_conf const * conf ) ;
+uga_socket uga_sock_create_and_listen_configured ( uga_string_view service, i32_t const backlog, uga_sock_conf const * conf ) ;
 
-uga_socket uga_sock_create             ( char const * host, char const * service ) ;
-uga_socket uga_sock_create_and_bind    ( char const * host, char const * service ) ;
-uga_socket uga_sock_create_and_connect ( char const * host, char const * service ) ;
+uga_socket uga_sock_create             ( uga_string_view host, uga_string_view service ) ;
+uga_socket uga_sock_create_and_bind    ( uga_string_view host, uga_string_view service ) ;
+uga_socket uga_sock_create_and_connect ( uga_string_view host, uga_string_view service ) ;
 
-uga_socket uga_sock_create_and_listen ( char const * service, i32_t const backlog ) ;
+uga_socket uga_sock_create_and_listen ( uga_string_view service, i32_t const backlog ) ;
 
 void uga_sock_bind    ( uga_socket const sock ) ;
 void uga_sock_connect ( uga_socket const sock ) ;

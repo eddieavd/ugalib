@@ -59,14 +59,14 @@ void uga_sock_set_ttl ( uga_socket * sock, char const * ttl )
 /// ip <-> str
 ////////////////////////////////////////////////////////////////////////////////
 
-uga_sockaddr_ipv4 uga_ipv4_from_str ( char const * ip )
+uga_sockaddr_ipv4 uga_ipv4_from_str ( uga_string_view ip )
 {
         uga_clr_errs() ;
 
         _sockaddr_in_t          sa ;
         uga_sockaddr_ipv4 sockaddr ;
 
-        if( inet_pton( UGA_SFAM_IPv4, ip, &( sa.sin_addr ) ) == 0 )
+        if( inet_pton( UGA_SFAM_IPv4, ip.data, &( sa.sin_addr ) ) == 0 )
         {
                 UGA_ERR_S( "uga::sock::ipv4_from_str", "bad ip" ) ;
                 uga_set_error( UGA_ERR_BAD_ARG, UGA_CAT_NONE ) ;
@@ -79,14 +79,14 @@ uga_sockaddr_ipv4 uga_ipv4_from_str ( char const * ip )
         return sockaddr ;
 }
 
-uga_sockaddr_ipv6 uga_ipv6_from_str ( char const * ip )
+uga_sockaddr_ipv6 uga_ipv6_from_str ( uga_string_view ip )
 {
         uga_clr_errs() ;
 
         _sockaddr_in6_t         sa ;
         uga_sockaddr_ipv6 sockaddr ;
 
-        if( inet_pton( UGA_SFAM_IPv6, ip, &( sa.sin6_addr ) ) == 0 )
+        if( inet_pton( UGA_SFAM_IPv6, ip.data, &( sa.sin6_addr ) ) == 0 )
         {
                 UGA_ERR_S( "uga::sock::ipv6_from_str", "bad ip" ) ;
                 uga_set_error( UGA_ERR_BAD_ARG, UGA_CAT_NONE ) ;
@@ -99,50 +99,60 @@ uga_sockaddr_ipv6 uga_ipv6_from_str ( char const * ip )
         return sockaddr ;
 }
 
-void uga_ipv4_to_str ( uga_sockaddr_ipv4 const * ip, char * dest )
+uga_string uga_ipv4_to_str ( uga_sockaddr_ipv4 const * ip )
 {
         uga_clr_errs() ;
 
-        if( !inet_ntop( UGA_SFAM_IPv4, &( ip->addr ), dest, UGA_IPv4_STRLEN ) )
+        uga_string ip_str = uga_str_create_1( UGA_IPv4_STRLEN + 1 ) ;
+
+        if( !inet_ntop( UGA_SFAM_IPv4, &( ip->addr ), ip_str.data, UGA_IPv4_STRLEN ) )
         {
                 _uga_check_std_errno() ;
         }
+        uga_str_check_size( &ip_str ) ;
+        return ip_str ;
 }
 
-void uga_ipv6_to_str ( uga_sockaddr_ipv6 const * ip, char * dest )
+uga_string uga_ipv6_to_str ( uga_sockaddr_ipv6 const * ip )
 {
         uga_clr_errs() ;
 
-        if( !inet_ntop( UGA_SFAM_IPv6, &( ip->addr ), dest, UGA_IPv6_STRLEN ) )
+        uga_string ip_str = uga_str_create_1( UGA_IPv6_STRLEN + 1 ) ;
+
+        if( !inet_ntop( UGA_SFAM_IPv6, &( ip->addr ), ip_str.data, UGA_IPv6_STRLEN ) )
         {
                 _uga_check_std_errno() ;
         }
+        uga_str_check_size( &ip_str ) ;
+        return ip_str ;
 }
 
-void uga_ip_to_str ( uga_addrinfo const * addr, char * dest )
+uga_string uga_ip_to_str ( uga_addrinfo const * addr )
 {
         if( addr->family == UGA_SFAM_IPv4 )
         {
-                uga_ipv4_to_str( ( uga_sockaddr_ipv4 const * ) &addr->addr, dest ) ;
+                return uga_ipv4_to_str( ( uga_sockaddr_ipv4 const * ) &addr->addr ) ;
         }
         else if( addr->family == UGA_SFAM_IPv6 )
         {
-                uga_ipv6_to_str( ( uga_sockaddr_ipv6 const * ) &addr->addr, dest ) ;
+                return uga_ipv6_to_str( ( uga_sockaddr_ipv6 const * ) &addr->addr ) ;
         }
         else
-        {}
+        {
+                return uga_str_create_0() ;
+        }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// addrinfo
 ////////////////////////////////////////////////////////////////////////////////
 
-uga_addrinfo uga_addrinfo_local_configured ( char const * service, uga_sock_conf const * conf )
+uga_addrinfo uga_addrinfo_local_configured ( uga_string_view service, uga_sock_conf const * conf )
 {
-        return uga_addrinfo_get_configured( NULL, service, conf ) ;
+        return uga_addrinfo_get_configured( uga_sv_create_0(), service, conf ) ;
 }
 
-uga_addrinfo uga_addrinfo_get_configured ( char const * node, char const * service, uga_sock_conf const * conf )
+uga_addrinfo uga_addrinfo_get_configured ( uga_string_view node, uga_string_view service, uga_sock_conf const * conf )
 {
         uga_clr_errs() ;
 
@@ -153,11 +163,11 @@ uga_addrinfo uga_addrinfo_get_configured ( char const * node, char const * servi
         memset( &hints, 0, sizeof( hints ) ) ;
         hints.ai_family   = conf->family ;
         hints.ai_socktype = conf->type   ;
-        hints.ai_flags    = node == NULL
+        hints.ai_flags    = node.data == NULL
                           ?   conf->flags | UGA_PASSIVE
                           : ( conf->flags | UGA_PASSIVE ) ^ UGA_PASSIVE ;
         uga_addrinfo addr = { 0 } ;
-        if( ( status = getaddrinfo( node, service, &hints, &servinfo ) ) != 0 )
+        if( ( status = getaddrinfo( node.data, service.data, &hints, &servinfo ) ) != 0 )
         {
                 UGA_WARN_S( "uga::sock::addrinfo_get_configured", "possible gai error: %s", gai_strerror( status ) ) ;
                 uga_set_gai_error( status, 0 ) ;
@@ -170,7 +180,7 @@ uga_addrinfo uga_addrinfo_get_configured ( char const * node, char const * servi
         return addr ;
 }
 
-_addrinfo_t * uga_addrinfo_raw_configured ( char const * node, char const * service, uga_sock_conf const * conf )
+_addrinfo_t * uga_addrinfo_raw_configured ( uga_string_view node, uga_string_view service, uga_sock_conf const * conf )
 {
         uga_clr_errs() ;
 
@@ -181,10 +191,10 @@ _addrinfo_t * uga_addrinfo_raw_configured ( char const * node, char const * serv
         memset( &hints, 0, sizeof( hints ) ) ;
         hints.ai_family   = conf->family ;
         hints.ai_socktype = conf->type   ;
-        hints.ai_flags    = node == NULL
+        hints.ai_flags    = node.data == NULL
                           ?   conf->flags | UGA_PASSIVE
                           : ( conf->flags | UGA_PASSIVE ) ^ UGA_PASSIVE ;
-        if( ( status = getaddrinfo( node, service, &hints, &servinfo ) ) != 0 )
+        if( ( status = getaddrinfo( node.data, service.data, &hints, &servinfo ) ) != 0 )
         {
                 UGA_WARN_S( "uga::sock::addrinfo_get_configured", "possible gai error: %s", gai_strerror( status ) ) ;
                 uga_set_gai_error( status, 0 ) ;
@@ -193,17 +203,17 @@ _addrinfo_t * uga_addrinfo_raw_configured ( char const * node, char const * serv
         return servinfo ;
 }
 
-uga_addrinfo uga_addrinfo_local ( char const * service )
+uga_addrinfo uga_addrinfo_local ( uga_string_view service )
 {
         return uga_addrinfo_local_configured( service, &uga_default_sock_config ) ;
 }
 
-uga_addrinfo uga_addrinfo_get ( char const * node, char const * service )
+uga_addrinfo uga_addrinfo_get ( uga_string_view node, uga_string_view service )
 {
         return uga_addrinfo_get_configured( node, service, &uga_default_sock_config ) ;
 }
 
-_addrinfo_t * uga_addrinfo_raw ( char const * node, char const * service )
+_addrinfo_t * uga_addrinfo_raw ( uga_string_view node, uga_string_view service )
 {
         return uga_addrinfo_raw_configured( node, service, &uga_default_sock_config ) ;
 }
@@ -236,37 +246,40 @@ uga_addrinfo uga_addrinfo_from_sockaddr ( uga_sockaddr_storage const sockaddr )
         return addr ;
 }
 
-void uga_get_ip_str ( char const * node, char const * service, char * dest )
+uga_string uga_get_ip_str ( uga_string_view node, uga_string_view service )
 {
         uga_addrinfo addr = uga_addrinfo_get( node, service ) ;
 
+        uga_string ip_str = uga_str_create_0() ;
+
         if( uga_had_errs() )
-        {
-                return ;
-        }
+        {}
         else if( addr.family == UGA_SFAM_IPv4 )
         {
-                uga_ipv4_to_str( ( uga_sockaddr_ipv4 * ) &addr.addr, dest ) ;
+                ip_str = uga_ipv4_to_str( ( uga_sockaddr_ipv4 * ) &addr.addr ) ;
         }
         else if( addr.family == UGA_SFAM_IPv6 )
         {
-                uga_ipv6_to_str( ( uga_sockaddr_ipv6 * ) &addr.addr, dest ) ;
+                ip_str = uga_ipv6_to_str( ( uga_sockaddr_ipv6 * ) &addr.addr ) ;
         }
         else
         {}
+        return ip_str ;
 }
 
-void uga_lookup_configured ( char const * host, char const * service, char * ip, u16_t * port, uga_sock_conf const * conf )
+void uga_lookup_configured ( uga_string_view host, uga_string_view service, char * ip, u16_t * port, uga_sock_conf const * conf )
 {
         uga_addrinfo info = uga_addrinfo_get_configured( host, service, conf ) ;
         if( uga_had_errs() ) return ;
 
-        uga_ip_to_str( &info, ip ) ;
+        uga_string ip_str = uga_ip_to_str( &info ) ;
+        memcpy( ip, ip_str.data, ip_str.size ) ;
+        uga_str_destroy( &ip_str ) ;
 
         *port = uga_ntohs( info.addr.port ) ;
 }
 
-void uga_reverse_lookup_configured ( char const * ip, char const * port, char * host, char * service, uga_sock_conf const * conf )
+void uga_reverse_lookup_configured ( uga_string_view ip, uga_string_view port, char * host, char * service, uga_sock_conf const * conf )
 {
         uga_addrinfo info = uga_addrinfo_get_configured( ip, port, conf ) ;
         if( uga_had_errs() ) return ;
@@ -274,12 +287,12 @@ void uga_reverse_lookup_configured ( char const * ip, char const * port, char * 
         uga_get_nameinfo( &info.addr, sizeof( info.addr ), host, 256, service, 256, 0 ) ; // TODO: remove hardcoded hostlen and servlen
 }
 
-void uga_lookup ( char const * host, char const * service, char * ip, u16_t * port )
+void uga_lookup ( uga_string_view host, uga_string_view service, char * ip, u16_t * port )
 {
         uga_lookup_configured( host, service, ip, port, &uga_default_sock_config ) ;
 }
 
-void uga_reverse_lookup ( char const * ip, char const * port, char * host, char * service )
+void uga_reverse_lookup ( uga_string_view ip, uga_string_view port, char * host, char * service )
 {
         uga_reverse_lookup_configured( ip, port, host, service, &uga_default_sock_config ) ;
 }
@@ -288,7 +301,7 @@ void uga_reverse_lookup ( char const * ip, char const * port, char * host, char 
 /// socket
 ////////////////////////////////////////////////////////////////////////////////
 
-uga_socket uga_sock_create_configured ( char const * host, char const * service, uga_sock_conf const * conf )
+uga_socket uga_sock_create_configured ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf )
 {
         uga_socket   sock = { -1, { 0 } } ;
         uga_addrinfo addr = uga_addrinfo_get_configured( host, service, conf ) ;
@@ -308,7 +321,7 @@ uga_socket uga_sock_create_configured ( char const * host, char const * service,
         return sock ;
 }
 
-uga_socket uga_sock_create_and_bind_configured ( char const * host, char const * service, uga_sock_conf const * conf )
+uga_socket uga_sock_create_and_bind_configured ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf )
 {
         uga_socket sock = uga_sock_create_configured( host, service, conf ) ;
 
@@ -321,7 +334,7 @@ uga_socket uga_sock_create_and_bind_configured ( char const * host, char const *
         return sock ;
 }
 
-uga_socket uga_sock_create_and_connect_configured ( char const * host, char const * service, uga_sock_conf const * conf )
+uga_socket uga_sock_create_and_connect_configured ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf )
 {
         uga_socket sock = uga_sock_create_configured( host, service, conf ) ;
 
@@ -334,9 +347,9 @@ uga_socket uga_sock_create_and_connect_configured ( char const * host, char cons
         return sock ;
 }
 
-uga_socket uga_sock_create_and_listen_configured ( char const * service, i32_t const backlog, uga_sock_conf const * conf )
+uga_socket uga_sock_create_and_listen_configured ( uga_string_view service, i32_t const backlog, uga_sock_conf const * conf )
 {
-        uga_socket sock = uga_sock_create_and_bind_configured( NULL, service, conf ) ;
+        uga_socket sock = uga_sock_create_and_bind_configured( uga_sv_create_0(), service, conf ) ;
 
         if( uga_had_errs() ) return sock ;
 
@@ -347,22 +360,22 @@ uga_socket uga_sock_create_and_listen_configured ( char const * service, i32_t c
         return sock ;
 }
 
-uga_socket uga_sock_create ( char const * host, char const * service )
+uga_socket uga_sock_create ( uga_string_view host, uga_string_view service )
 {
         return uga_sock_create_configured( host, service, &uga_default_sock_config ) ;
 }
 
-uga_socket uga_sock_create_and_bind ( char const * host, char const * service )
+uga_socket uga_sock_create_and_bind ( uga_string_view host, uga_string_view service )
 {
         return uga_sock_create_and_bind_configured( host, service, &uga_default_sock_config ) ;
 }
 
-uga_socket uga_sock_create_and_connect ( char const * host, char const * service )
+uga_socket uga_sock_create_and_connect ( uga_string_view host, uga_string_view service )
 {
         return uga_sock_create_and_connect_configured( host, service, &uga_default_sock_config ) ;
 }
 
-uga_socket uga_sock_create_and_listen ( char const * service, i32_t const backlog )
+uga_socket uga_sock_create_and_listen ( uga_string_view service, i32_t const backlog )
 {
         return uga_sock_create_and_listen_configured( service, backlog, &uga_default_sock_config ) ;
 }
