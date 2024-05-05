@@ -8,6 +8,7 @@
 #include <core/uga_log.h>
 #include <core/uga_err.h>
 #include <core/uga_alloc.h>
+#include <core/uga_strview.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -55,6 +56,15 @@ uga_string uga_str_create_from_2 ( char const * data, i64_t const datalen )
         str.size = datalen ;
 
         return str ;
+}
+
+uga_string uga_str_create_cstr ( uga_string_view source )
+{
+        uga_string cstr = uga_str_create_1( source.size + 1 ) ;
+        uga_str_append( &cstr, source.data, source.size ) ;
+        uga_str_append( &cstr, "\0", 1 ) ;
+
+        return cstr ;
 }
 
 uga_string uga_str_copy ( uga_string other )

@@ -9,8 +9,8 @@
 #include <core/uga_err.h>
 #include <core/uga_alloc.h>
 #include <core/uga_str.h>
+#include <core/uga_strview.h>
 
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -21,30 +21,28 @@
 #endif
 
 
-i64_t uga_fs_filesize ( char const * filepath )
+i64_t uga_fs_filesize ( uga_string_view filepath )
 {
         uga_clr_errs() ;
+
+        uga_string fname_cstr = uga_str_create_cstr( filepath ) ;
 
         i32_t file ;
 
 #if !defined( O_PATH ) || !defined( __O_PATH )
-        if( ( file = open( filepath, O_RDONLY ) ) == -1 )
+        if( ( file = open( fname_cstr.data, O_RDONLY ) ) == -1 )
 #else
-        if( ( file = open( filepath, O_PATH ) ) == -1 )
+        if( ( file = open( fname_cstr.data, O_PATH ) ) == -1 )
 #endif
         {
                 _uga_check_std_errno() ;
+                uga_str_destroy( &fname_cstr ) ;
                 return -1 ;
         }
-        struct stat filestats ;
-
-        if( fstat( file, &filestats ) == -1 )
-        {
-                _uga_check_std_errno() ;
-                return -1 ;
-        }
+        i64_t filesize = uga_fs_filesize_fd( file ) ;
+        uga_str_destroy( &fname_cstr ) ;
         uga_fs_close( file ) ;
-        return filestats.st_size ;
+        return filesize ;
 }
 
 i64_t uga_fs_filesize_fd ( i32_t const filedesc )
@@ -61,9 +59,11 @@ i64_t uga_fs_filesize_fd ( i32_t const filedesc )
         return filestats.st_size ;
 }
 
-i32_t uga_fs_file_access ( char const * filepath, i32_t const mode )
+i32_t uga_fs_file_access ( uga_string_view filepath, i32_t const mode )
 {
-        if( access( filepath, mode ) == 0 )
+        uga_string fname_cstr = uga_str_create_cstr( filepath ) ;
+
+        if( access( fname_cstr.data, mode ) == 0 )
         {
                 return 1 ;
         }
@@ -72,57 +72,61 @@ i32_t uga_fs_file_access ( char const * filepath, i32_t const mode )
                 _uga_check_std_errno() ;
                 return 0 ;
         }
+        uga_str_destroy( &fname_cstr ) ;
 }
 
-i32_t uga_fs_file_exists ( char const * filepath )
+i32_t uga_fs_file_exists ( uga_string_view filepath )
 {
         return uga_fs_file_access( filepath, F_OK ) ;
 }
 
-i32_t uga_fs_file_readable ( char const * filepath )
+i32_t uga_fs_file_readable ( uga_string_view filepath )
 {
         return uga_fs_file_access( filepath, R_OK ) ;
 }
 
-i32_t uga_fs_file_writeable ( char const * filepath )
+i32_t uga_fs_file_writeable ( uga_string_view filepath )
 {
         return uga_fs_file_access( filepath, W_OK ) ;
 }
 
-i32_t uga_fs_file_executable ( char const * filepath )
+i32_t uga_fs_file_executable ( uga_string_view filepath )
 {
         return uga_fs_file_access( filepath, X_OK ) ;
 }
 
-i32_t uga_fs_open_file ( char const * filepath, i32_t const flags, i32_t const mode )
+i32_t uga_fs_open_file ( uga_string_view filepath, i32_t const flags, i32_t const mode )
 {
         uga_clr_errs() ;
 
+        uga_string fname_cstr = uga_str_create_cstr( filepath ) ;
+
         i32_t file ;
 
-        if( ( file = open( filepath, flags, mode ) ) == -1 )
+        if( ( file = open( fname_cstr.data, flags, mode ) ) == -1 )
         {
                 _uga_check_std_errno() ;
         }
+        uga_str_destroy( &fname_cstr ) ;
         return file ;
 }
 
-i32_t uga_fs_open_read ( char const * filepath )
+i32_t uga_fs_open_read ( uga_string_view filepath )
 {
         return uga_fs_open_file( filepath, O_RDONLY, 0 ) ;
 }
 
-i32_t uga_fs_open_write ( char const * filepath )
+i32_t uga_fs_open_write ( uga_string_view filepath )
 {
         return uga_fs_open_file( filepath, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR ) ;
 }
 
-i32_t uga_fs_open_append ( char const * filepath )
+i32_t uga_fs_open_append ( uga_string_view filepath )
 {
         return uga_fs_open_file( filepath, O_CREAT | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR ) ;
 }
 
-i32_t uga_fs_open_full ( char const * filepath )
+i32_t uga_fs_open_full ( uga_string_view filepath )
 {
         return uga_fs_open_file( filepath, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR ) ;
 }
@@ -135,143 +139,65 @@ void uga_fs_close ( i32_t const file )
         }
 }
 
-u8_t * uga_fs_read_fd ( i32_t const fd )
+i64_t uga_fs_read_fd ( i32_t const fd, uga_string * dest )
 {
-        i64_t filesize = uga_fs_filesize_fd( fd ) ;
+        uga_clr_errs() ;
 
-        if( uga_had_errs() )
-        {
-                uga_fs_close( fd ) ;
-                return NULL ;
-        }
-        u8_t * data = ( u8_t * ) uga_allocate( filesize ) ;
-        if( uga_had_errs() )
-        {
-                uga_fs_close( fd ) ;
-                return NULL ;
-        }
-        i64_t bytes_read = read( fd, data, filesize ) ;
+        i64_t bytes_read = read( fd, dest->data, dest->capacity ) ;
 
         if( bytes_read == -1 )
         {
                 _uga_check_std_errno() ;
-                uga_fs_close( fd ) ;
-                free( data ) ;
-                return NULL ;
         }
-        else if( bytes_read < filesize )
+        else if( bytes_read < dest->capacity )
         {
-                UGA_WARN_S( "uga::fs::read_file", "partial read, wanted %db, got %db", filesize, bytes_read ) ;
-                uga_set_io_error( UGA_ERR_PARTIAL_READ, filesize, bytes_read ) ;
+                UGA_WARN_S( "uga::fs::read_fd", "partial read, wanted %db, got %db", dest->capacity, bytes_read ) ;
+                uga_set_io_error( UGA_ERR_PARTIAL_READ, dest->capacity, bytes_read ) ;
         }
-        return data ;
+        return bytes_read ;
 }
 
-void uga_fs_read_fd_into ( i32_t const fd, u8_t * dest, i64_t const destlen )
+i64_t uga_fs_write_fd ( i32_t const fd, uga_string_view data )
 {
-        i64_t filesize = uga_fs_filesize_fd( fd ) ;
+        uga_clr_errs() ;
 
-        if( uga_had_errs() ) return ;
-
-        if( filesize > destlen ) filesize = destlen ;
-
-        i64_t bytes_read = read( fd, dest, filesize ) ;
-        if( bytes_read == -1 )
-        {
-                _uga_check_std_errno() ;
-        }
-        else if( bytes_read < filesize )
-        {
-                UGA_WARN_S( "uga::fs::read_file_into", "partial read, wanted %db, got %db", filesize, bytes_read ) ;
-                uga_set_io_error( UGA_ERR_PARTIAL_READ, filesize, bytes_read ) ;
-        }
-}
-
-u8_t * uga_fs_read_file ( char const * filepath )
-{
-        i32_t file = uga_fs_open_read( filepath ) ;
-        u8_t * data = uga_fs_read_fd( file ) ;
-
-        uga_fs_close( file ) ;
-
-        return data ;
-}
-
-void uga_fs_read_file_into ( char const * filepath, u8_t * dest, i64_t const destlen )
-{
-        i32_t file = uga_fs_open_read( filepath ) ;
-
-        uga_fs_read_fd_into( file, dest, destlen ) ;
-        uga_fs_close( file ) ;
-}
-
-void uga_fs_read_file_into_str ( char const * filepath, uga_string * str )
-{
-        i64_t filesize = uga_fs_filesize( filepath ) ;
-        uga_str_reserve( str, filesize ) ;
-        if( uga_had_errs() ) return ;
-
-        uga_fs_read_file_into( filepath, ( u8_t * ) str->data, str->capacity ) ;
-        if( uga_had_errs() ) return ;
-
-        str->size = filesize ;
-}
-
-uga_string uga_fs_read_file_str ( char const * filepath )
-{
-        i64_t filesize = uga_fs_filesize( filepath ) ;
-        uga_string contents = uga_str_create_1( filesize ) ;
-        if( uga_had_errs() ) return contents ;
-
-        uga_fs_read_file_into( filepath, ( u8_t * ) contents.data, contents.capacity ) ;
-        if( uga_had_errs() ) return contents ;
-
-        contents.size = filesize ;
-
-        return contents ;
-}
-
-void uga_fs_write_file ( char const * filepath, u8_t const * data, i64_t const datalen )
-{
-        i32_t file = uga_fs_open_full( filepath ) ;
-
-        if( uga_had_errs() ) return ;
-
-        i64_t bytes_written = write( file, data, datalen ) ;
+        i64_t bytes_written = write( fd, data.data, data.size ) ;
 
         if( bytes_written == -1 )
         {
                 _uga_check_std_errno() ;
         }
-        else if( bytes_written < datalen )
+        else if( bytes_written < data.size )
         {
-                UGA_WARN_S( "uga::fs::write_file", "partial write, wanted %db, got %db", datalen, bytes_written ) ;
-                uga_set_io_error( UGA_ERR_PARTIAL_WRITE, datalen, bytes_written ) ;
+                UGA_WARN_S( "uga::fs::write_fd", "partial write, wanted %db, written %db", data.size, bytes_written ) ;
+                uga_set_io_error( UGA_ERR_PARTIAL_WRITE, data.size, bytes_written ) ;
         }
-        uga_fs_close( file ) ;
+        return bytes_written ;
 }
 
-void uga_fs_append_file ( char const * filepath, u8_t const * data, i64_t const datalen )
+uga_string uga_fs_read_file ( uga_string_view filename )
 {
-        i32_t file = uga_fs_open_append( filepath ) ;
+        i32_t fd = uga_fs_open_read( filename ) ;
+        i64_t filesize = uga_fs_filesize_fd( fd ) ;
 
-        if( uga_had_errs() ) return ;
+        uga_string data = uga_str_create_1( filesize ) ;
+        UGA_RETURN_ON_ERR( data ) ;
 
-        i64_t bytes_written = write( file, data, datalen ) ;
+        uga_fs_read_fd( fd, &data ) ;
 
-        if( bytes_written == -1 )
-        {
-                _uga_check_std_errno() ;
-        }
-        else if( bytes_written < datalen )
-        {
-                UGA_WARN_S( "uga::fs::write_file", "partial write, wanted %db, got %db", datalen, bytes_written ) ;
-                uga_set_io_error( UGA_ERR_PARTIAL_WRITE, datalen, bytes_written ) ;
-        }
-        uga_fs_close( file ) ;
+        return data ;
 }
 
-void uga_fs_write_file_str ( char const * filepath, uga_string const * str )
+i64_t uga_fs_write_file ( uga_string_view filename, uga_string_view data )
 {
-        uga_fs_write_file( filepath, ( u8_t const * ) str->data, str->size ) ;
+        i32_t fd = uga_fs_open_write( filename ) ;
+
+        return uga_fs_write_fd( fd, data ) ;
+}
+
+i64_t uga_fs_append_file ( uga_string_view filename, uga_string_view data )
+{
+        i32_t fd = uga_fs_open_append( filename ) ;
+
+        return uga_fs_write_fd( fd, data ) ;
 }

@@ -14,6 +14,9 @@
 #define STR_ARG(str) (i32_t) (str).size, (str).data
 
 
+struct uga_string_view_t ;
+typedef struct uga_string_view_t uga_string_view ;
+
 struct uga_string_t
 {
         char *    data ;
@@ -28,6 +31,8 @@ uga_string uga_str_create_1 ( i64_t const capacity ) ;
 
 uga_string uga_str_create_from_1 ( char const * cstr                      ) ;
 uga_string uga_str_create_from_2 ( char const * data, i64_t const datalen ) ;
+
+uga_string uga_str_create_cstr ( uga_string_view source ) ;
 
 uga_string uga_str_copy ( uga_string   other ) ;
 uga_string uga_str_move ( uga_string * other ) ;
