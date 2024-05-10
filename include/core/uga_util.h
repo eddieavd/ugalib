@@ -7,6 +7,8 @@
 #ifndef UGA_UTIL_H_
 #define UGA_UTIL_H_
 
+#define UGA_ALIGN( x ) __attribute__(( aligned( x ) ))
+
 
 enum endian
 {

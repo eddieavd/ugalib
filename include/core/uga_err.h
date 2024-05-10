@@ -11,6 +11,7 @@
 #define UGA_RETURN_ON_ERR( val ) if( uga_had_errs() ) { uga_print_error(); return val; }
 
 #include <core/uga_types.h>
+#include <core/uga_util.h>
 #include <core/uga_log.h>
 
 
@@ -52,7 +53,7 @@ typedef struct
         uga_errtype     type ;
         uga_err_category cat ;
         u8_t       data[ 8 ] ;
-} uga_error ;
+} UGA_ALIGN( 8 ) uga_error ;
 
 typedef struct
 {
@@ -60,7 +61,7 @@ typedef struct
         uga_err_category cat ;
         i32_t         err_no ;
         i32_t           data ;
-} uga_error_std ;
+} UGA_ALIGN( 8 ) uga_error_std ;
 
 typedef struct
 {
@@ -68,7 +69,7 @@ typedef struct
         uga_err_category cat ;
         i32_t         err_no ;
         i32_t           data ;
-} uga_error_gai ;
+} UGA_ALIGN( 8 ) uga_error_gai ;
 
 typedef struct
 {
@@ -76,7 +77,7 @@ typedef struct
         uga_err_category  cat ;
         i32_t          wanted ;
         i32_t             got ;
-} uga_error_io ;
+} UGA_ALIGN( 8 ) uga_error_io ;
 
 typedef struct
 {
@@ -91,7 +92,7 @@ typedef struct
         uga_err_category cat ;
         i32_t           size ;
         i32_t            pos ;
-} uga_error_mem ;
+} UGA_ALIGN( 8 ) uga_error_mem ;
 
 typedef struct
 {
@@ -106,7 +107,7 @@ typedef struct
         uga_err_category cat ;
         i32_t err ;
         u32_t thread_id ;
-} uga_error_thrd ;
+} UGA_ALIGN( 8 ) uga_error_thrd ;
 
 
 void _uga_check_std_err   ( i32_t const std_errno ) ;
