@@ -10,6 +10,7 @@
 #include <string.h>
 #include <errno.h>
 #include <netdb.h>
+#include <threads.h>
 
 
 static uga_error uga_errdata = { UGA_ERR_NONE, UGA_CAT_NONE, { 0 } } ;
@@ -40,6 +41,14 @@ char const * uga_strerror ( uga_errtype const err )
                         return "partial read" ;
                 case UGA_ERR_PARTIAL_WRITE:
                         return "partial write" ;
+                case UGA_ERR_CLI:
+                        return "cli" ;
+                case UGA_ERR_THRD_NOMEM:
+                        return "thread no mem" ;
+                case UGA_ERR_THRD_TIMEDOUT:
+                        return "thread timed out" ;
+                case UGA_ERR_THRD_BUSY:
+                        return "thread busy" ;
                 case UGA_ERR_UNKNOWN:
                         return "unknown" ;
                 default:
@@ -64,6 +73,7 @@ uga_error_io    const * uga_get_io_errdata    ( void ) { return ( uga_error_io  
 uga_error_alloc const * uga_get_alloc_errdata ( void ) { return ( uga_error_alloc const * ) &uga_errdata ; }
 uga_error_mem   const * uga_get_mem_errdata   ( void ) { return ( uga_error_mem   const * ) &uga_errdata ; }
 uga_error_cli   const * uga_get_cli_errdata   ( void ) { return ( uga_error_cli   const * ) &uga_errdata ; }
+uga_error_thrd  const * uga_get_thrd_errdata  ( void ) { return ( uga_error_thrd  const * ) &uga_errdata ; }
 
 void uga_set_error ( uga_errtype const type, uga_err_category const cat )
 {
@@ -131,6 +141,16 @@ void uga_set_cli_error ( uga_errtype const type )
         err-> cat = UGA_CAT_CLI ;
 }
 
+void uga_set_thrd_error ( uga_errtype const type, i32_t const thrd_e, uga_thread_id const thrd_id )
+{
+        uga_error_thrd * err = ( uga_error_thrd * ) &uga_errdata ;
+
+        err->     type =           type ;
+        err->      cat = UGA_CAT_THREAD ;
+        err->      err =         thrd_e ;
+        err->thread_id =        thrd_id ;
+}
+
 uga_error   uga_current_error   ( void ) { return uga_errdata      ; }
 uga_errtype uga_current_errtype ( void ) { return uga_errdata.type ; }
 
@@ -155,6 +175,7 @@ void _uga_print_io_err    ( uga_error_io    const * error, uga_log_lvl const lev
 void _uga_print_alloc_err ( uga_error_alloc const * error, uga_log_lvl const level ) ;
 void _uga_print_mem_err   ( uga_error_mem   const * error, uga_log_lvl const level ) ;
 void _uga_print_cli_err   ( uga_error_cli   const * error, uga_log_lvl const level ) ;
+void _uga_print_thrd_err  ( uga_error_thrd  const * error, uga_log_lvl const level ) ;
 
 void _uga_print_error ( uga_error const * error, uga_log_lvl const level )
 {
@@ -177,6 +198,9 @@ void _uga_print_error ( uga_error const * error, uga_log_lvl const level )
                         break ;
                 case UGA_CAT_CLI:
                         _uga_print_cli_err( uga_get_cli_errdata(), level ) ;
+                        break ;
+                case UGA_CAT_THREAD:
+                        _uga_print_thrd_err( uga_get_thrd_errdata(), level ) ;
                         break ;
                 case UGA_CAT_UNKNOWN:
                         UGA_ERR( "unknown error category" ) ;
@@ -250,6 +274,15 @@ void _uga_check_std_errno ( void )
         _uga_check_std_err( errno ) ;
 }
 
+void _uga_check_thrd_err ( i32_t const thrd_err, uga_thread_id const thrd_id )
+{
+        if( thrd_err != thrd_success )
+        {
+                UGA_WARN_S( "uga::err", "possible thread error" ) ;
+                uga_set_thrd_error( UGA_ERR_NONE, thrd_err, thrd_id ) ;
+        }
+}
+
 void _uga_print_std_err ( uga_error_std const * error, uga_log_lvl const level )
 {
         ( void ) error ;
@@ -291,4 +324,12 @@ void _uga_print_cli_err ( uga_error_cli const * error, uga_log_lvl const level )
         ( void ) level ;
 
         UGA_LOG( level, "cli error: unknown option or missing option value" ) ;
+}
+
+void _uga_print_thrd_err ( uga_error_thrd const * error, uga_log_lvl const level )
+{
+        ( void ) error ;
+        ( void ) level ;
+
+        UGA_LOG( level, "%s on thread %ull", uga_strerror( error->type ), error->thread_id ) ;
 }

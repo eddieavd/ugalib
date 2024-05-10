@@ -28,6 +28,9 @@ typedef enum
         UGA_ERR_PARTIAL_READ  ,
         UGA_ERR_PARTIAL_WRITE ,
         UGA_ERR_CLI           ,
+        UGA_ERR_THRD_NOMEM    ,
+        UGA_ERR_THRD_TIMEDOUT ,
+        UGA_ERR_THRD_BUSY     ,
         UGA_ERR_UNKNOWN       ,
 } uga_errtype ;
 
@@ -40,6 +43,7 @@ typedef enum
         UGA_CAT_ALLOC   ,
         UGA_CAT_MEM     ,
         UGA_CAT_CLI     ,
+        UGA_CAT_THREAD  ,
         UGA_CAT_UNKNOWN ,
 } uga_err_category ;
 
@@ -96,9 +100,19 @@ typedef struct
         i8_t const *     opts ;
 } uga_error_cli ;
 
+typedef struct
+{
+        uga_errtype type ;
+        uga_err_category cat ;
+        i32_t err ;
+        u32_t thread_id ;
+} uga_error_thrd ;
+
 
 void _uga_check_std_err   ( i32_t const std_errno ) ;
 void _uga_check_std_errno ( void                  ) ;
+
+void _uga_check_thrd_err ( i32_t const thrd_err, uga_thread_id const thrd_id ) ;
 
 char const * uga_strerror ( uga_errtype const errtype ) ;
 
@@ -115,12 +129,13 @@ uga_error_cli   const * uga_get_cli_errdata   ( void ) ;
 
 void uga_set_error ( uga_errtype const type, uga_err_category const cat ) ;
 
-void uga_set_std_error   (                         i32_t const err_no, i32_t const data ) ;
-void uga_set_gai_error   (                         i32_t const err_no, i32_t const data ) ;
-void uga_set_io_error    ( uga_errtype const type, i32_t const wanted, i32_t const  got ) ;
-void uga_set_alloc_error ( uga_errtype const type, i64_t const wanted                   ) ;
-void uga_set_mem_error   ( uga_errtype const type, i32_t const   size, i32_t const  pos ) ;
-void uga_set_cli_error   ( uga_errtype const type                                       ) ;
+void uga_set_std_error   (                         i32_t const err_no, i32_t         const    data ) ;
+void uga_set_gai_error   (                         i32_t const err_no, i32_t         const    data ) ;
+void uga_set_io_error    ( uga_errtype const type, i32_t const wanted, i32_t         const     got ) ;
+void uga_set_alloc_error ( uga_errtype const type, i64_t const wanted                              ) ;
+void uga_set_mem_error   ( uga_errtype const type, i32_t const   size, i32_t         const     pos ) ;
+void uga_set_cli_error   ( uga_errtype const type                                                  ) ;
+void uga_set_thrd_error  ( uga_errtype const type, i32_t const thrd_e, uga_thread_id const thrd_id ) ;
 
 uga_error   uga_current_error   ( void ) ;
 uga_errtype uga_current_errtype ( void ) ;

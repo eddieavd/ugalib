@@ -1,9 +1,9 @@
 # ugalib
 
 PROJECT = ugalib
-SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c
+SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c src/core/uga_thread.c
 
-SOURCES_CORE = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c
+SOURCES_CORE = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/core/uga_thread.c
 SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c
 
 # CC  = clang-18

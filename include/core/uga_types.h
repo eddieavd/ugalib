@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <threads.h>
 
 #define UGA_IPv4_STRLEN  INET_ADDRSTRLEN
 #define UGA_IPv6_STRLEN INET6_ADDRSTRLEN
@@ -44,6 +45,12 @@ typedef struct  in_addr           _in_addr_t ;
 typedef struct in6_addr          _in6_addr_t ;
 
 typedef struct sockaddr_storage _sockaddr_storage_t ;
+
+typedef thrd_t uga_thread_id ;
+typedef  mtx_t uga_mtx_t     ;
+typedef  cnd_t uga_cnd_t     ;
+
+typedef struct timespec _timespec_t ;
 
 
 #endif // UGA_TYPES_H_

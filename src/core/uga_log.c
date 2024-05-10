@@ -6,8 +6,8 @@
 
 #include <core/uga_log.h>
 #include <core/uga_types.h>
+#include <core/uga_thread.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -18,71 +18,82 @@
 
 void uga_log_2 ( uga_log_lvl level, char const * fmt, ... )
 {
-        switch( level )
-        {
-                case UGA_LVL_DBG:
-                        fprintf( stderr, "%s%sUGA::DBG  : ", uga_log_purple(), uga_log_bold() ) ;
-                        break ;
-                case UGA_LVL_INFO:
-                        fprintf( stderr, "%sUGA::INFO : ", uga_log_bold() ) ;
-                        break ;
-                case UGA_LVL_WARN:
-                        fprintf( stderr, "%s%sUGA::WARN : ", uga_log_yellow(), uga_log_bold() ) ;
-                        break ;
-                case UGA_LVL_ERR:
-                        fprintf( stderr, "%s%sUGA::ERR  : ", uga_log_red(), uga_log_bold() ) ;
-                        break ;
-                case UGA_LVL_SUCC:
-                        fprintf( stderr, "%s%sUGA::SUCC : ", uga_log_green(), uga_log_bold() ) ;
-                        break ;
-                case UGA_LVL_FAIL:
-                        fprintf( stderr, "%s%sUGA::FAIL : ", uga_log_red(), uga_log_bold() ) ;
-                        break ;
-                default:
-                        break ;
-        }
-        fprintf( stderr, "%s", uga_log_reset() ) ;
-
         va_list args ;
         va_start( args, fmt ) ;
-        vfprintf( stderr, fmt, args ) ;
+        uga_log_2_v( level, fmt, args ) ;
         va_end( args ) ;
-        fprintf( stderr, "\n" ) ;
 }
 
 void uga_log_3 ( uga_log_lvl level, char const * scope, char const * fmt, ... )
 {
+        va_list args ;
+        va_start( args, fmt ) ;
+        uga_log_3_v( level, scope, fmt, args ) ;
+        va_end( args ) ;
+}
+
+void uga_log_2_v ( uga_log_lvl level, char const * fmt, va_list args )
+{
         switch( level )
         {
                 case UGA_LVL_DBG:
-                        fprintf( stderr, "%s%sUGA::DBG  : %s : ", uga_log_purple(), uga_log_bold(), scope ) ;
+                        fprintf( stderr, "%s%sUGA::DBG  : %lu : ", uga_log_purple(), uga_log_bold(), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_INFO:
-                        fprintf( stderr, "%sUGA::INFO : %s : ", uga_log_bold(), scope ) ;
+                        fprintf( stderr, "%sUGA::INFO : %lu : ", uga_log_bold(), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_WARN:
-                        fprintf( stderr, "%s%sUGA::WARN : %s : ", uga_log_yellow(), uga_log_bold(), scope ) ;
+                        fprintf( stderr, "%s%sUGA::WARN : %lu : ", uga_log_yellow(), uga_log_bold(), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_ERR:
-                        fprintf( stderr, "%s%sUGA::ERR  : %s : ", uga_log_red(), uga_log_bold(), scope ) ;
+                        fprintf( stderr, "%s%sUGA::ERR  : %lu : ", uga_log_red(), uga_log_bold(), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_SUCC:
-                        fprintf( stderr, "%s%sUGA::SUCC : %s : ", uga_log_green(), uga_log_bold(), scope ) ;
+                        fprintf( stderr, "%s%sUGA::SUCC : %lu : ", uga_log_green(), uga_log_bold(), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_FAIL:
-                        fprintf( stderr, "%s%sUGA::FAIL : %s : ", uga_log_red(), uga_log_bold(), scope ) ;
+                        fprintf( stderr, "%s%sUGA::FAIL : %lu : ", uga_log_red(), uga_log_bold(), uga_thread_self() ) ;
                         break ;
                 default:
                         break ;
         }
         fprintf( stderr, "%s", uga_log_reset() ) ;
 
-        va_list args ;
-        va_start( args, fmt ) ;
         vfprintf( stderr, fmt, args ) ;
-        va_end( args ) ;
         fprintf( stderr, "\n" ) ;
 }
+
+void uga_log_3_v ( uga_log_lvl level, char const * scope, char const * fmt, va_list args )
+{
+        switch( level )
+        {
+                case UGA_LVL_DBG:
+                        fprintf( stderr, "%s%sUGA::DBG  : %s : %lu : ", uga_log_purple(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        break ;
+                case UGA_LVL_INFO:
+                        fprintf( stderr, "%sUGA::INFO : %s : %lu : ", uga_log_bold(), scope, uga_thread_self() ) ;
+                        break ;
+                case UGA_LVL_WARN:
+                        fprintf( stderr, "%s%sUGA::WARN : %s : %lu : ", uga_log_yellow(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        break ;
+                case UGA_LVL_ERR:
+                        fprintf( stderr, "%s%sUGA::ERR  : %s : %lu : ", uga_log_red(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        break ;
+                case UGA_LVL_SUCC:
+                        fprintf( stderr, "%s%sUGA::SUCC : %s : %lu : ", uga_log_green(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        break ;
+                case UGA_LVL_FAIL:
+                        fprintf( stderr, "%s%sUGA::FAIL : %s : %lu : ", uga_log_red(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        break ;
+                default:
+                        break ;
+        }
+        fprintf( stderr, "%s", uga_log_reset() ) ;
+
+        vfprintf( stderr, fmt, args ) ;
+        fprintf( stderr, "\n" ) ;
+}
+
 
 static bool uga_term_has_color = false ;
 

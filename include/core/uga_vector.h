@@ -36,7 +36,7 @@ bool uga_vec_empty ( uga_vector const * this ) ;
 
 i64_t uga_vec_space_left ( uga_vector const * this ) ;
 
-void * _uga_vec_at ( uga_vector * this, i64_t const index ) ;
+void * uga_vec_at_ptr ( uga_vector * this, i64_t const index ) ;
 
 void uga_vec_at ( uga_vector * this, i64_t const index, void * dest ) ;
 

@@ -77,7 +77,7 @@ i64_t uga_vec_space_left ( uga_vector const * this )
         return this->capacity - this->size ;
 }
 
-void * _uga_vec_at ( uga_vector * this, i64_t const index )
+void * uga_vec_at_ptr ( uga_vector * this, i64_t const index )
 {
         /*
         if( index < 0 || index >= this->size )
@@ -91,7 +91,7 @@ void * _uga_vec_at ( uga_vector * this, i64_t const index )
 
 void uga_vec_at ( uga_vector * this, i64_t const index, void * dest )
 {
-        memcpy( dest, _uga_vec_at( this, index ), this->elem_size ) ;
+        memcpy( dest, uga_vec_at_ptr( this, index ), this->elem_size ) ;
 }
 
 void uga_vec_reserve ( uga_vector * this, i64_t const capacity )

@@ -13,6 +13,8 @@
 #ifndef UGA_LOG_H_
 #define UGA_LOG_H_
 
+#include <stdio.h>
+
 
 typedef enum
 {
@@ -26,6 +28,9 @@ typedef enum
 
 void uga_log_2 ( uga_log_lvl level,                     char const * fmt, ... ) ;
 void uga_log_3 ( uga_log_lvl level, char const * scope, char const * fmt, ... ) ;
+
+void uga_log_2_v ( uga_log_lvl level,                     char const * fmt, va_list args ) ;
+void uga_log_3_v ( uga_log_lvl level, char const * scope, char const * fmt, va_list args ) ;
 
 void uga_log_init ( void ) ;
 
