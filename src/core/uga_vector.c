@@ -56,13 +56,11 @@ uga_vector uga_vec_move ( uga_vector * other )
 {
         uga_vector vec = _uga_vec_create_0( other->elem_size ) ;
 
-        vec.data = other->data ;
-        vec.size = other->size ;
+        vec.    data = other->    data ;
+        vec.    size = other->    size ;
         vec.capacity = other->capacity ;
 
-        other->data     = NULL ;
-        other->size     =    0 ;
-        other->capacity =    0 ;
+        *other = _uga_vec_create_0( other->elem_size ) ;
 
         return vec ;
 }
@@ -79,19 +77,21 @@ i64_t uga_vec_space_left ( uga_vector const * this )
 
 void * uga_vec_at_ptr ( uga_vector * this, i64_t const index )
 {
-        /*
+        uga_clr_errs() ;
+
         if( index < 0 || index >= this->size )
         {
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return NULL ;
         }
-        */
         return ( char * ) this->data + ( index * this->elem_size ) ;
 }
 
 void uga_vec_at ( uga_vector * this, i64_t const index, void * dest )
 {
-        memcpy( dest, uga_vec_at_ptr( this, index ), this->elem_size ) ;
+        void * elem_ptr = uga_vec_at_ptr( this, index ) ;
+        UGA_RETURN_ON_ERR() ;
+        memcpy( dest, elem_ptr, this->elem_size ) ;
 }
 
 void uga_vec_reserve ( uga_vector * this, i64_t const capacity )
@@ -127,7 +127,7 @@ void uga_vec_shrink_to_fit ( uga_vector * this )
 
 void uga_vec_push_back ( uga_vector * this, void * value )
 {
-        if( uga_vec_empty( this ) || uga_vec_space_left( this ) < this->elem_size )
+        if( uga_vec_empty( this ) || uga_vec_space_left( this ) < 1 )
         {
                 uga_vec_reserve( this, this->capacity == 0 ? 1 : this->capacity * 2 ) ;
         }
