@@ -48,8 +48,8 @@ $(LIBFILE): $(OBJECTS)
 .PHONY: mrepro
 mrepro: $(LIBFILE)
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) mrepro/bot.c    -o bot    $(LDFLAGS)
-	$(CC) $(CFLAGS) mrepro/server.c -o server $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/mrepro/bot.c    -o bot    $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/mrepro/server.c -o server $(LDFLAGS)
 
 .PHONY: examples
 examples: $(LIBFILE)
