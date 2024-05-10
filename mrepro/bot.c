@@ -17,7 +17,7 @@
 #define CMD_TCP '1'
 #define CMD_UDP '2'
 #define CMD_RUN '3'
-#define CMD_FIN '4'
+#define CMD_FIN '0'
 
 
 typedef struct
@@ -52,7 +52,7 @@ int main ( int argc, char ** argv )
         uga_string_view   ip = uga_sv_create_1( argv[ 1 ] ) ;
         uga_string_view port = uga_sv_create_1( argv[ 2 ] ) ;
 
-        UGA_INFO_S( "lab2::bot", "cnc config: ip: %s, port: %s", ip, port ) ;
+        UGA_INFO_S( "lab2::bot", "cnc config: ip: "SV_FMT", port: "SV_FMT, SV_ARG( ip ), SV_ARG( port ) ) ;
 
         uga_socket cnc_sock = uga_sock_create_and_connect_configured( ip, port, &udp_config ) ;
         uga_print_abort_if_err() ;
@@ -126,9 +126,43 @@ void do_attack ( message_t const * command, uga_string const * payload )
 {
         ( void ) command ;
         ( void ) payload ;
+
+
 }
 
 void print_help ( void )
 {
         UGA_ERR( "usage: ./bot ip port" ) ;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
