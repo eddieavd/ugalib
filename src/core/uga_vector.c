@@ -75,7 +75,7 @@ i64_t uga_vec_space_left ( uga_vector const * this )
         return this->capacity - this->size ;
 }
 
-void * uga_vec_at_ptr ( uga_vector * this, i64_t const index )
+void * uga_vec_at_ptr ( uga_vector const * this, i64_t const index )
 {
         uga_clr_errs() ;
 
@@ -87,7 +87,7 @@ void * uga_vec_at_ptr ( uga_vector * this, i64_t const index )
         return ( char * ) this->data + ( index * this->elem_size ) ;
 }
 
-void uga_vec_at ( uga_vector * this, i64_t const index, void * dest )
+void uga_vec_at ( uga_vector const * this, i64_t const index, void * dest )
 {
         void * elem_ptr = uga_vec_at_ptr( this, index ) ;
         UGA_RETURN_ON_ERR() ;

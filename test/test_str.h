@@ -50,7 +50,7 @@ static inline void test_str ( void )
                 uga_string move = uga_str_move( &src ) ;
 
                 test_log( "test::str::move", uga_str_empty( src ) ) ;
-                test_log( "test::str::copy", uga_sv_equal( uga_sv_create_from( &copy ),
+                test_log( "test::str::move", uga_sv_equal( uga_sv_create_from( &copy ),
                                                            uga_sv_create_from( &move ) ) ) ;
                 uga_str_destroy( & src ) ;
                 uga_str_destroy( &copy ) ;
