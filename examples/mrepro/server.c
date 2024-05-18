@@ -99,7 +99,7 @@ bool tcp_callback ( uga_callback * callback_data )
         if( uga_sv_equal( hello_msg, uga_sv_create_from( &message ) ) )
         {
                 UGA_INFO_S( "lab2::server::tcp_callback", "sent payloads" ) ;
-                uga_send_str( &client, payloads, 0 ) ;
+                uga_send_str( &client, uga_sv_create_from( payloads ), 0 ) ;
         }
         uga_sock_shutdown( &client, SHUT_RDWR ) ;
         uga_sock_close( &client ) ;
@@ -120,7 +120,7 @@ bool udp_callback ( uga_callback * callback_data )
         if( uga_sv_equal( hello_msg, uga_sv_create_from( &message ) ) )
         {
                 UGA_INFO_S( "lab2::server::udp_callback", "sent payloads" ) ;
-                uga_send_str_to( sock, payloads, 0 ) ;
+                uga_send_str_to( sock, uga_sv_create_from( payloads ), 0 ) ;
         }
         uga_str_destroy( &message ) ;
         return true ;
