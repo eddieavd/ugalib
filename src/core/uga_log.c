@@ -6,15 +6,63 @@
 
 #include <core/uga_log.h>
 #include <core/uga_types.h>
+#include <core/uga_str.h>
 #include <core/uga_thread.h>
 
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/time.h>
 
 #define VTSEQ(ID) ("\x1b[" #ID "m")
 
+
+_timespec_t uga_time_empty ( void )
+{
+        _timespec_t time = { 0 } ;
+        return time ;
+}
+
+_timespec_t uga_time_current ( void )
+{
+        _timespec_t time ;
+        clock_gettime( CLOCK_REALTIME, &time ) ;
+        return time ;
+}
+
+_timespec_t uga_time_current_m ( void )
+{
+        _timespec_t time ;
+        clock_gettime( CLOCK_MONOTONIC_RAW, &time ) ;
+        return time ;
+}
+
+uga_string uga_time_string ( void )
+{
+        uga_string time_str = uga_str_create_1( 2 + 1 + 2 + 1 + 2 + 1 + 3 + 1 ) ; // HH:MM:SS:mmm\0
+
+        _timespec_t time = uga_time_current() ;
+
+        struct tm const * tms = localtime( &time.tv_sec ) ;
+
+        i32_t msec = ( i32_t ) time.tv_nsec / 1000000 ;
+
+        uga_str_push_back( &time_str, '0' + ( tms->tm_hour / 10 ) ) ;
+        uga_str_push_back( &time_str, '0' + ( tms->tm_hour % 10 ) ) ;
+        uga_str_push_back( &time_str, ':' ) ;
+        uga_str_push_back( &time_str, '0' + ( tms->tm_min / 10 ) ) ;
+        uga_str_push_back( &time_str, '0' + ( tms->tm_min % 10 ) ) ;
+        uga_str_push_back( &time_str, ':' ) ;
+        uga_str_push_back( &time_str, '0' + ( tms->tm_sec / 10 ) ) ;
+        uga_str_push_back( &time_str, '0' + ( tms->tm_sec % 10 ) ) ;
+        uga_str_push_back( &time_str, ':' ) ;
+        uga_str_push_back( &time_str, '0' +   ( msec / 100 )        ) ;
+        uga_str_push_back( &time_str, '0' + ( ( msec /  10 ) % 10 ) ) ;
+        uga_str_push_back( &time_str, '0' +   ( msec %  10 )        ) ;
+
+        return time_str ;
+}
 
 void uga_log_2 ( uga_log_lvl level, char const * fmt, ... )
 {
@@ -34,64 +82,78 @@ void uga_log_3 ( uga_log_lvl level, char const * scope, char const * fmt, ... )
 
 void uga_log_2_v ( uga_log_lvl level, char const * fmt, va_list args )
 {
+        if( level > UGA_LOG_LVL ) return ;
+
+        uga_string time = uga_time_string() ;
+
         switch( level )
         {
                 case UGA_LVL_DBG:
-                        fprintf( stderr, "%s%sUGA::DBG  : %lu : ", uga_log_purple(), uga_log_bold(), uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::DBG  : ", uga_log_purple(), uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_INFO:
-                        fprintf( stderr, "%sUGA::INFO : %lu : ", uga_log_bold(), uga_thread_self() ) ;
+                        fprintf( stderr, "%s:: "STR_FMT" : %lu : UGA::INFO : ", uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_WARN:
-                        fprintf( stderr, "%s%sUGA::WARN : %lu : ", uga_log_yellow(), uga_log_bold(), uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::WARN : ", uga_log_yellow(), uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_ERR:
-                        fprintf( stderr, "%s%sUGA::ERR  : %lu : ", uga_log_red(), uga_log_bold(), uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::ERR  : ", uga_log_red(), uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_SUCC:
-                        fprintf( stderr, "%s%sUGA::SUCC : %lu : ", uga_log_green(), uga_log_bold(), uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::SUCC : ", uga_log_green(), uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 case UGA_LVL_FAIL:
-                        fprintf( stderr, "%s%sUGA::FAIL : %lu : ", uga_log_red(), uga_log_bold(), uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::FAIL : ", uga_log_red(), uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 default:
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::LOG  : ", uga_log_white(), uga_log_dim(),STR_ARG( time ), uga_thread_self() ) ;
                         break ;
         }
         fprintf( stderr, "%s", uga_log_reset() ) ;
 
         vfprintf( stderr, fmt, args ) ;
         fprintf( stderr, "\n" ) ;
+
+        uga_str_destroy( &time ) ;
 }
 
 void uga_log_3_v ( uga_log_lvl level, char const * scope, char const * fmt, va_list args )
 {
+        if( level > UGA_LOG_LVL ) return ;
+
+        uga_string time = uga_time_string() ;
+
         switch( level )
         {
                 case UGA_LVL_DBG:
-                        fprintf( stderr, "%s%sUGA::DBG  : %s : %lu : ", uga_log_purple(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::DBG  : %s : ", uga_log_purple(), uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 case UGA_LVL_INFO:
-                        fprintf( stderr, "%sUGA::INFO : %s : %lu : ", uga_log_bold(), scope, uga_thread_self() ) ;
+                        fprintf( stderr, "%s:: "STR_FMT" : %lu : UGA::INFO : %s : ", uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 case UGA_LVL_WARN:
-                        fprintf( stderr, "%s%sUGA::WARN : %s : %lu : ", uga_log_yellow(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::WARN : %s : ", uga_log_yellow(), uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 case UGA_LVL_ERR:
-                        fprintf( stderr, "%s%sUGA::ERR  : %s : %lu : ", uga_log_red(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::ERR  : %s : ", uga_log_red(), uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 case UGA_LVL_SUCC:
-                        fprintf( stderr, "%s%sUGA::SUCC : %s : %lu : ", uga_log_green(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::SUCC : %s : ", uga_log_green(), uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 case UGA_LVL_FAIL:
-                        fprintf( stderr, "%s%sUGA::FAIL : %s : %lu : ", uga_log_red(), uga_log_bold(), scope, uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::FAIL : %s : ", uga_log_red(), uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 default:
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::LOG  : %s : ", uga_log_white(), uga_log_dim(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
         }
         fprintf( stderr, "%s", uga_log_reset() ) ;
 
         vfprintf( stderr, fmt, args ) ;
         fprintf( stderr, "\n" ) ;
+
+        uga_str_destroy( &time ) ;
 }
 
 
