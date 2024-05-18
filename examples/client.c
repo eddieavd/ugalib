@@ -7,6 +7,7 @@
 #define UGA_NUM_CLI_ARGS 2
 
 #include <uganet.h>
+#include <core/uga_cli.h>
 
 #include <stddef.h>
 #include <string.h>
