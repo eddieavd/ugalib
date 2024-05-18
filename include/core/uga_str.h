@@ -32,10 +32,16 @@ uga_string uga_str_create_1 ( i64_t const capacity ) ;
 uga_string uga_str_create_from_1 ( char const * cstr                      ) ;
 uga_string uga_str_create_from_2 ( char const * data, i64_t const datalen ) ;
 
+uga_string uga_str_assign_from_1 ( char * cstr                      ) ;
+uga_string uga_str_assign_from_2 ( char * data, i64_t const datalen ) ;
+
 uga_string uga_str_create_cstr ( uga_string_view source ) ;
 
 uga_string uga_str_copy ( uga_string   other ) ;
 uga_string uga_str_move ( uga_string * other ) ;
+
+uga_string * uga_str_new_copy ( uga_string   other ) ;
+uga_string * uga_str_new_move ( uga_string * other ) ;
 
 char       * uga_str_data  ( uga_string * str ) ;
 char const * uga_str_cdata ( uga_string   str ) ;
@@ -43,6 +49,7 @@ char const * uga_str_cdata ( uga_string   str ) ;
 i64_t uga_str_size     ( uga_string str ) ;
 i64_t uga_str_capacity ( uga_string str ) ;
 bool  uga_str_empty    ( uga_string str ) ;
+bool  uga_str_null     ( uga_string str ) ;
 
 char uga_str_at ( uga_string str, i64_t const pos ) ;
 
