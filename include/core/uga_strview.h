@@ -33,6 +33,10 @@ i32_t uga_sv_equal       ( uga_string_view  lhs, uga_string_view    rhs ) ;
 i32_t uga_sv_starts_with ( uga_string_view this, uga_string_view prefix ) ;
 i32_t uga_sv_ends_with   ( uga_string_view this, uga_string_view suffix ) ;
 
+i32_t uga_sv_equal_insensitive       ( uga_string_view  lhs, uga_string_view    rhs ) ;
+i32_t uga_sv_starts_with_insensitive ( uga_string_view this, uga_string_view prefix ) ;
+i32_t uga_sv_ends_with_insensitive   ( uga_string_view this, uga_string_view suffix ) ;
+
 void uga_sv_trim       ( uga_string_view * this ) ;
 void uga_sv_trim_left  ( uga_string_view * this ) ;
 void uga_sv_trim_right ( uga_string_view * this ) ;
