@@ -15,10 +15,10 @@
 #include <core/uga_alloc.h>
 #include <core/uga_str.h>
 #include <core/uga_strview.h>
-#include <core/uga_cli.h>
 
 #include <net/uga_sock.h>
 #include <net/uga_talk.h>
+#include <net/uga_async.h>
 
 
 #endif // UGANET_H_
