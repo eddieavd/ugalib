@@ -11,8 +11,9 @@
 #include <string.h>
 
 
-uga_sl_node * _uga_sl_node_create  ( i64_t const  elem_size ) ;
-void          _uga_sl_node_destroy ( uga_sl_node *     node ) ;
+uga_sl_node * _uga_sl_node_create      ( i64_t const  elem_size              ) ;
+uga_sl_node * _uga_sl_node_create_with ( i64_t const  elem_size, void * data ) ;
+void          _uga_sl_node_destroy     ( uga_sl_node *     node              ) ;
 
 uga_sl_list _uga_sl_list_create ( i64_t const elem_size )
 {
@@ -29,9 +30,7 @@ void uga_sl_list_push_back ( uga_sl_list * this, void * data )
 {
         if( this->size == 0 )
         {
-                this->head = _uga_sl_node_create( this->elem_size ) ;
-
-                memcpy( this->head->data, data, this->elem_size ) ;
+                this->head = _uga_sl_node_create_with( this->elem_size, data ) ;
         }
         else
         {
@@ -41,9 +40,7 @@ void uga_sl_list_push_back ( uga_sl_list * this, void * data )
                 {
                         last = last->next ;
                 }
-                last->next = _uga_sl_node_create( this->elem_size ) ;
-
-                memcpy( last->next->data, data, this->elem_size ) ;
+                last->next = _uga_sl_node_create_with( this->elem_size, data ) ;
         }
         ++this->size ;
 }
@@ -52,18 +49,14 @@ void uga_sl_list_push_front ( uga_sl_list * this, void * data )
 {
         if( this->size == 0 )
         {
-                this->head = _uga_sl_node_create( this->elem_size ) ;
-
-                memcpy( this->head->data, data, this->elem_size ) ;
+                this->head = _uga_sl_node_create_with( this->elem_size, data ) ;
         }
         else
         {
-                uga_sl_node * new_front = _uga_sl_node_create( this->elem_size ) ;
+                uga_sl_node * new_front = _uga_sl_node_create_with( this->elem_size, data ) ;
 
                 new_front->next = this->head ;
                 this->head      =  new_front ;
-
-                memcpy( new_front->data, data, this->elem_size ) ;
         }
         ++this->size ;
 }
@@ -156,7 +149,7 @@ void uga_sl_list_pop_front ( uga_sl_list * this, void * dest )
         _uga_sl_node_destroy( node ) ;
 }
 
-void * uga_sl_list_at ( uga_sl_list * this, i64_t const index )
+void * uga_sl_list_node_at ( uga_sl_list * this, i64_t const index )
 {
         uga_clr_errs() ;
 
@@ -173,6 +166,14 @@ void * uga_sl_list_at ( uga_sl_list * this, i64_t const index )
                 node = node->next ;
                 ++pos ;
         }
+        return node ;
+}
+
+void * uga_sl_list_at ( uga_sl_list * this, i64_t const index )
+{
+        uga_sl_node * node = uga_sl_list_node_at( this, index ) ;
+        UGA_RETURN_ON_ERR( NULL ) ;
+
         return node->data ;
 }
 
@@ -183,6 +184,16 @@ void uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index, void * dest 
         if( index < 0 || index >= this->size )
         {
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
+                return ;
+        }
+        if( index == 0 )
+        {
+                uga_sl_list_pop_front( this, dest ) ;
+                return ;
+        }
+        if( index == this->size - 1 )
+        {
+                uga_sl_list_pop_back( this, dest ) ;
                 return ;
         }
         i64_t          pos =          0 ;
@@ -202,6 +213,29 @@ void uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index, void * dest 
         node->next = to_remove->next ;
 
         _uga_sl_node_destroy( to_remove ) ;
+        --this->size ;
+}
+
+void uga_sl_list_insert_at ( uga_sl_list * this, i64_t const index, void * data )
+{
+        if( index <= 0 )
+        {
+                uga_sl_list_push_front( this, data ) ;
+        }
+        else if( index >= this->size )
+        {
+                uga_sl_list_push_back( this, data ) ;
+        }
+        else
+        {
+                uga_sl_node * to_insert = _uga_sl_node_create_with( this->elem_size, data ) ;
+                uga_sl_node * node      =  uga_sl_list_node_at( this, index - 1 ) ;
+
+                to_insert->next = node->next ;
+                node->next = to_insert ;
+
+                ++this->size ;
+        }
 }
 
 bool uga_sl_list_empty ( uga_sl_list const * list )
@@ -227,6 +261,14 @@ uga_sl_node * _uga_sl_node_create ( i64_t const elem_size )
         return node ;
 }
 
+uga_sl_node * _uga_sl_node_create_with ( i64_t const elem_size, void * data )
+{
+        uga_sl_node * node = _uga_sl_node_create( elem_size ) ;
+        memcpy( node->data, data, elem_size ) ;
+
+        return node ;
+}
+
 void _uga_sl_node_destroy ( uga_sl_node * node )
 {
         uga_deallocate( node->data ) ;
@@ -234,8 +276,9 @@ void _uga_sl_node_destroy ( uga_sl_node * node )
 }
 
 
-uga_dl_node * _uga_dl_node_create  ( i64_t const  elem_size ) ;
-void          _uga_dl_node_destroy ( uga_dl_node *     node ) ;
+uga_dl_node * _uga_dl_node_create       ( i64_t const  elem_size              ) ;
+uga_dl_node * _uga_dl_node_create_with  ( i64_t const  elem_size, void * data ) ;
+void          _uga_dl_node_destroy      ( uga_dl_node *     node              ) ;
 
 uga_dl_list _uga_dl_list_create ( i64_t const elem_size )
 {
@@ -252,9 +295,7 @@ void uga_dl_list_push_back ( uga_dl_list * this, void * data )
 {
         if( this->size == 0 )
         {
-                this->head = _uga_dl_node_create( this->elem_size ) ;
-
-                memcpy( this->head->data, data, this->elem_size ) ;
+                this->head = _uga_dl_node_create_with( this->elem_size, data ) ;
         }
         else
         {
@@ -264,10 +305,8 @@ void uga_dl_list_push_back ( uga_dl_list * this, void * data )
                 {
                         last = last->next ;
                 }
-                last->next = _uga_dl_node_create( this->elem_size ) ;
+                last->next = _uga_dl_node_create_with( this->elem_size, data ) ;
                 last->next->prev = last ;
-
-                memcpy( last->next->data, data, this->elem_size ) ;
         }
         ++this->size ;
 }
@@ -276,19 +315,15 @@ void uga_dl_list_push_front ( uga_dl_list * this, void * data )
 {
         if( this->size == 0 )
         {
-                this->head = _uga_dl_node_create( this->elem_size ) ;
-
-                memcpy( this->head->data, data, this->elem_size ) ;
+                this->head = _uga_dl_node_create_with( this->elem_size, data ) ;
         }
         else
         {
-                uga_dl_node * new_front = _uga_dl_node_create( this->elem_size ) ;
+                uga_dl_node * new_front = _uga_dl_node_create_with( this->elem_size, data ) ;
 
                 new_front->next = this->head ;
                 this->head->prev = new_front ;
                 this->head = new_front ;
-
-                memcpy( new_front->data, data, this->elem_size ) ;
         }
         ++this->size ;
 }
@@ -386,7 +421,7 @@ void uga_dl_list_pop_front ( uga_dl_list * this, void * dest )
         --this->size ;
 }
 
-void * uga_dl_list_at ( uga_dl_list * this, i64_t const index )
+void * uga_dl_list_node_at ( uga_dl_list * this, i64_t const index )
 {
         uga_clr_errs() ;
 
@@ -403,6 +438,14 @@ void * uga_dl_list_at ( uga_dl_list * this, i64_t const index )
                 node = node->next ;
                 ++pos ;
         }
+        return node ;
+}
+
+void * uga_dl_list_at ( uga_dl_list * this, i64_t const index )
+{
+        uga_dl_node * node = uga_dl_list_node_at( this, index ) ;
+        UGA_RETURN_ON_ERR( NULL ) ;
+
         return node->data ;
 }
 
@@ -413,6 +456,16 @@ void uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index, void * dest 
         if( index < 0 || index >= this->size )
         {
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
+                return ;
+        }
+        if( index == 0 )
+        {
+                uga_dl_list_pop_front( this, dest ) ;
+                return ;
+        }
+        if( index == this->size - 1 )
+        {
+                uga_dl_list_pop_back( this, dest ) ;
                 return ;
         }
         i64_t          pos =          0 ;
@@ -431,6 +484,32 @@ void uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index, void * dest 
                 memcpy( dest, node->data, this->elem_size ) ;
         }
         _uga_dl_node_destroy( node ) ;
+        --this->size ;
+}
+
+void uga_dl_list_insert_at ( uga_dl_list * this, i64_t const index, void * data )
+{
+        if( index <= 0 )
+        {
+                uga_dl_list_push_front( this, data ) ;
+        }
+        else if( index >= this->size )
+        {
+                uga_dl_list_push_back( this, data ) ;
+        }
+        else
+        {
+                uga_dl_node * to_insert = _uga_dl_node_create_with( this->elem_size, data ) ;
+                uga_dl_node * node      =  uga_dl_list_node_at( this, index ) ;
+
+                node->prev->next = to_insert ;
+                to_insert->prev = node->prev ;
+
+                node->prev = to_insert ;
+                to_insert->next = node ;
+
+                ++this->size ;
+        }
 }
 
 bool uga_dl_list_empty ( uga_dl_list const * this )
@@ -453,6 +532,14 @@ uga_dl_node * _uga_dl_node_create ( i64_t const elem_size )
         node->data = uga_allocate( elem_size ) ;
         node->next = NULL ;
         node->prev = NULL ;
+
+        return node ;
+}
+
+uga_dl_node * _uga_dl_node_create_with ( i64_t const elem_size, void * data )
+{
+        uga_dl_node * node = _uga_dl_node_create( elem_size ) ;
+        memcpy( node->data, data, elem_size ) ;
 
         return node ;
 }

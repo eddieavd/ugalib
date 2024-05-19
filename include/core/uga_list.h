@@ -40,6 +40,7 @@ void * uga_sl_list_peek_front ( uga_sl_list * this ) ;
 void uga_sl_list_pop_back  ( uga_sl_list * this, void * dest ) ;
 void uga_sl_list_pop_front ( uga_sl_list * this, void * dest ) ;
 
+void * uga_sl_list_node_at   ( uga_sl_list * this, i64_t const index              ) ;
 void * uga_sl_list_at        ( uga_sl_list * this, i64_t const index              ) ;
 void   uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index, void * dest ) ;
 void   uga_sl_list_insert_at ( uga_sl_list * this, i64_t const index, void * data ) ;
@@ -77,6 +78,7 @@ void * uga_dl_list_peek_front ( uga_dl_list * this ) ;
 void uga_dl_list_pop_back  ( uga_dl_list * this, void * dest ) ;
 void uga_dl_list_pop_front ( uga_dl_list * this, void * dest ) ;
 
+void * uga_dl_list_node_at   ( uga_dl_list * this, i64_t const index              ) ;
 void * uga_dl_list_at        ( uga_dl_list * this, i64_t const index              ) ;
 void   uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index, void * dest ) ;
 void   uga_dl_list_insert_at ( uga_dl_list * this, i64_t const index, void * data ) ;
