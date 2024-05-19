@@ -6,25 +6,22 @@
 
 #include <core/uga_thread.h>
 #include <core/uga_err.h>
+#include <core/uga_alloc.h>
 
 #include <pthread.h>
 
 
-_timespec_t uga_time_current ( void )
-{
-        _timespec_t time ;
-        timespec_get( &time, TIME_UTC ) ;
-        return time ;
-}
-
-uga_thread uga_thread_do_task ( uga_task task )
+uga_thread * uga_thread_do_task ( uga_task task )
 {
         uga_clr_errs() ;
 
-        uga_thread thread = { .id = -1, .task = task } ;
+        uga_thread * thread = uga_allocate( sizeof( uga_thread ) ) ;
 
-        i32_t err = thrd_create( &thread.id, task.run, NULL ) ;
-        _uga_check_thrd_err( err, thread.id ) ;
+        thread->id = -1 ;
+        thread->task.data = uga_str_copy( task.data ) ;
+        thread->task. run =               task. run   ;
+        i32_t err = thrd_create( &thread->id, thread->task.run, &thread->task.data ) ;
+        _uga_check_thrd_err( err, thread->id ) ;
 
         return thread ;
 }
@@ -58,7 +55,7 @@ void _uga_thread_sleep ( _timespec_t const * time )
 
 void uga_thread_sleep_ns ( i64_t const nanos )
 {
-        _timespec_t sleepytime = uga_time_current() ;
+        _timespec_t sleepytime = uga_time_empty() ;
         sleepytime.tv_nsec += nanos ;
 
         _uga_thread_sleep( &sleepytime ) ;
@@ -66,7 +63,7 @@ void uga_thread_sleep_ns ( i64_t const nanos )
 
 void uga_thread_sleep_ms ( i64_t const millis )
 {
-        _timespec_t sleepytime = uga_time_current() ;
+        _timespec_t sleepytime = uga_time_empty() ;
         sleepytime.tv_nsec += millis * 1000000 ;
 
         _uga_thread_sleep( &sleepytime ) ;
@@ -74,7 +71,7 @@ void uga_thread_sleep_ms ( i64_t const millis )
 
 void uga_thread_sleep_s ( i64_t const secs )
 {
-        _timespec_t sleepytime = uga_time_current() ;
+        _timespec_t sleepytime = uga_time_empty() ;
         sleepytime.tv_sec += secs ;
 
         _uga_thread_sleep( &sleepytime ) ;
@@ -157,6 +154,7 @@ void uga_mtx_destroy ( uga_mtx_t * mtx )
         mtx_destroy( mtx ) ;
 }
 
+
 uga_cnd_t uga_cnd_init ( void )
 {
         uga_clr_errs() ;
@@ -236,4 +234,69 @@ i32_t uga_cnd_ping_all ( uga_cnd_t * cnd )
 void uga_cnd_destroy ( uga_cnd_t * cnd )
 {
         cnd_destroy( cnd ) ;
+}
+
+
+uga_semaphore uga_sem_init ( i32_t init_val )
+{
+        uga_semaphore sem ;
+
+        sem.val = init_val ;
+
+        sem.mtx = uga_mtx_init( UGA_MTX_PLAIN ) ;
+        sem.cnd = uga_cnd_init(               ) ;
+
+        return sem ;
+}
+
+void uga_sem_acquire ( uga_semaphore * sem )
+{
+        UGA_DBG_S( "uga::sem::acquire", "acquiring sem mtx..." ) ;
+        uga_mtx_acquire( &sem->mtx ) ;
+        UGA_DBG_S( "uga::sem::acquire", "sem mtx acquired" ) ;
+
+        if( sem->val > 0 )
+        {
+                UGA_DBG_S( "uga::sem::acquire", "semaphore green, decreasing and releasing..." ) ;
+                --sem->val ;
+                uga_mtx_release( &sem->mtx ) ;
+                return ;
+        }
+        UGA_DBG_S( "uga::sem::acquire", "semaphore red, waiting for a release..." ) ;
+        uga_cnd_wait( &sem->cnd, &sem->mtx ) ;
+        UGA_DBG_S( "uga::sem::acquire", "got a green, decreasing and releasing..." ) ;
+        --sem->val ;
+        uga_mtx_release( &sem->mtx ) ;
+}
+
+void uga_sem_release ( uga_semaphore * sem )
+{
+        UGA_DBG_S( "uga::sem::release", "acquiring sem mtx..." ) ;
+        uga_mtx_acquire( &sem->mtx ) ;
+        UGA_DBG_S( "uga::sem::release", "sem mtx acquired" ) ;
+
+        ++sem->val ;
+
+        UGA_DBG_S( "uga::sem::release", "value increased, pinging and releasing..." ) ;
+        uga_cnd_ping( &sem->cnd ) ;
+        uga_mtx_release( &sem->mtx ) ;
+}
+
+void uga_sem_release_n ( uga_semaphore * sem, i32_t count )
+{
+        UGA_DBG_S( "uga::sem::release_n", "acquiring sem mtx..." ) ;
+        uga_mtx_acquire( &sem->mtx ) ;
+        UGA_DBG_S( "uga::sem::release_n", "sem mtx acquired" ) ;
+
+        sem->val += count ;
+
+        UGA_DBG_S( "uga::sem::release_n", "value increased, pinging all and releasing..." ) ;
+        uga_cnd_ping_all( &sem->cnd ) ;
+        uga_mtx_release( &sem->mtx ) ;
+}
+
+void uga_sem_destroy ( uga_semaphore * sem )
+{
+        uga_mtx_destroy( &sem->mtx ) ;
+        uga_cnd_destroy( &sem->cnd ) ;
 }
