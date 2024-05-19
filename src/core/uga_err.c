@@ -5,6 +5,7 @@
 //
 
 #include <core/uga_err.h>
+#include <core/uga_log.h>
 
 #include <stdlib.h>
 #include <string.h>
