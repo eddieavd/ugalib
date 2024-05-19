@@ -61,7 +61,7 @@ void uga_sl_list_push_front ( uga_sl_list * this, void * data )
                 uga_sl_node * new_front = _uga_sl_node_create( this->elem_size ) ;
 
                 new_front->next = this->head ;
-                this->head = new_front ;
+                this->head      =  new_front ;
 
                 memcpy( new_front->data, data, this->elem_size ) ;
         }
@@ -70,8 +70,13 @@ void uga_sl_list_push_front ( uga_sl_list * this, void * data )
 
 void * uga_sl_list_peek_back ( uga_sl_list * this )
 {
-        if( this->size == 0 ) return NULL ;
+        uga_clr_errs() ;
 
+        if( this->size == 0 )
+        {
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, 0, 0 ) ;
+                return NULL ;
+        }
         uga_sl_node * node = this->head ;
 
         while( node->next != NULL )
@@ -83,8 +88,11 @@ void * uga_sl_list_peek_back ( uga_sl_list * this )
 
 void * uga_sl_list_peek_front ( uga_sl_list * this )
 {
-        if( this->size == 0 ) return NULL ;
-
+        if( this->size == 0 )
+        {
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, 0, 0 ) ;
+                return NULL ;
+        }
         return this->head->data ;
 }
 
@@ -143,16 +151,8 @@ void uga_sl_list_pop_front ( uga_sl_list * this, void * dest )
         {
                 memcpy( dest, node->data, this->elem_size ) ;
         }
-        if( this->size == 1 )
-        {
-                this->size =    0 ;
-                this->head = NULL ;
-        }
-        else
-        {
-                --this->size ;
-                this->head = node->next ;
-        }
+        this->head = node->next ;
+        --this->size ;
         _uga_sl_node_destroy( node ) ;
 }
 
@@ -165,7 +165,7 @@ void * uga_sl_list_at ( uga_sl_list * this, i64_t const index )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return NULL ;
         }
-        i64_t pos = 0 ;
+        i64_t          pos =          0 ;
         uga_sl_node * node = this->head ;
 
         while( pos != index )
@@ -176,7 +176,7 @@ void * uga_sl_list_at ( uga_sl_list * this, i64_t const index )
         return node->data ;
 }
 
-void uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index )
+void uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index, void * dest )
 {
         uga_clr_errs() ;
 
@@ -185,7 +185,7 @@ void uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return ;
         }
-        i64_t pos = 0 ;
+        i64_t          pos =          0 ;
         uga_sl_node * node = this->head ;
 
         while( pos + 1 != index )
@@ -195,37 +195,13 @@ void uga_sl_list_remove_at ( uga_sl_list * this, i64_t const index )
         }
         uga_sl_node * to_remove = node->next ;
 
+        if( dest )
+        {
+                memcpy( dest, to_remove->data, this->elem_size ) ;
+        }
         node->next = to_remove->next ;
 
         _uga_sl_node_destroy( to_remove ) ;
-}
-
-void uga_sl_list_pop_at ( uga_sl_list * this, i64_t const index, void * dest )
-{
-        uga_clr_errs() ;
-
-        if( index < 0 || index >= this->size )
-        {
-                uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
-                return ;
-        }
-        i64_t pos = 0 ;
-        uga_sl_node * node = this->head ;
-
-        while( pos + 1 != index )
-        {
-                node = node->next ;
-                ++pos ;
-        }
-        uga_sl_node * to_pop = node->next ;
-
-        if( dest )
-        {
-                memcpy( dest, to_pop->data, this->elem_size ) ;
-        }
-        node->next = to_pop->next ;
-
-        _uga_sl_node_destroy( to_pop ) ;
 }
 
 bool uga_sl_list_empty ( uga_sl_list const * list )
@@ -260,7 +236,6 @@ void _uga_sl_node_destroy ( uga_sl_node * node )
 
 uga_dl_node * _uga_dl_node_create  ( i64_t const  elem_size ) ;
 void          _uga_dl_node_destroy ( uga_dl_node *     node ) ;
-
 
 uga_dl_list _uga_dl_list_create ( i64_t const elem_size )
 {
@@ -320,8 +295,13 @@ void uga_dl_list_push_front ( uga_dl_list * this, void * data )
 
 void * uga_dl_list_peek_back ( uga_dl_list * this )
 {
-        if( this->size == 0 ) return NULL ;
+        uga_clr_errs() ;
 
+        if( this->size == 0 )
+        {
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, 0, 0 ) ;
+                return NULL ;
+        }
         uga_dl_node * node = this->head ;
 
         while( node->next != NULL )
@@ -333,8 +313,11 @@ void * uga_dl_list_peek_back ( uga_dl_list * this )
 
 void * uga_dl_list_peek_front ( uga_dl_list * this )
 {
-        if( this->size == 0 ) return NULL ;
-
+        if( this->size == 0 )
+        {
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, 0, 0 ) ;
+                return NULL ;
+        }
         return this->head->data ;
 }
 
@@ -392,16 +375,15 @@ void uga_dl_list_pop_front ( uga_dl_list * this, void * dest )
         }
         if( this->size == 1 )
         {
-                this->size =    0 ;
                 this->head = NULL ;
         }
         else
         {
-                --this->size ;
                 this->head = node->next ;
                 this->head->prev = NULL ;
         }
         _uga_dl_node_destroy( node ) ;
+        --this->size ;
 }
 
 void * uga_dl_list_at ( uga_dl_list * this, i64_t const index )
@@ -413,7 +395,7 @@ void * uga_dl_list_at ( uga_dl_list * this, i64_t const index )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return NULL ;
         }
-        i64_t pos = 0 ;
+        i64_t          pos =          0 ;
         uga_dl_node * node = this->head ;
 
         while( pos != index )
@@ -424,7 +406,7 @@ void * uga_dl_list_at ( uga_dl_list * this, i64_t const index )
         return node->data ;
 }
 
-void uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index )
+void uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index, void * dest )
 {
         uga_clr_errs() ;
 
@@ -433,30 +415,7 @@ void uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return ;
         }
-        i64_t pos = 0 ;
-        uga_dl_node * node = this->head ;
-
-        while( pos != index )
-        {
-                node = node->next ;
-                ++pos ;
-        }
-        node->prev->next = node->next ;
-        node->next->next = node->prev ;
-
-        _uga_dl_node_destroy( node ) ;
-}
-
-void uga_dl_list_pop_at ( uga_dl_list * this, i64_t const index, void * dest )
-{
-        uga_clr_errs() ;
-
-        if( index < 0 || index >= this->size )
-        {
-                uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
-                return ;
-        }
-        i64_t pos = 0 ;
+        i64_t          pos =          0 ;
         uga_dl_node * node = this->head ;
 
         while( pos != index )
