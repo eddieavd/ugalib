@@ -34,8 +34,8 @@ uga_vector uga_vec_move ( uga_vector       * other ) ;
 
 bool   uga_vec_empty      ( uga_vector const * this                                 ) ;
 i64_t  uga_vec_space_left ( uga_vector const * this                                 ) ;
-void * uga_vec_at_ptr     ( uga_vector const * this, i64_t const index              ) ;
-void   uga_vec_at         ( uga_vector const * this, i64_t const index, void * dest ) ;
+void * uga_vec_at         ( uga_vector const * this, i64_t const index              ) ;
+void   uga_vec_get_at     ( uga_vector const * this, i64_t const index, void * dest ) ;
 
 void uga_vec_reserve       ( uga_vector * this, i64_t const capacity ) ;
 void uga_vec_shrink_to_fit ( uga_vector * this                       ) ;

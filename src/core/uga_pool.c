@@ -115,13 +115,13 @@ void uga_pool_destroy ( uga_thread_pool * pool )
         UGA_DBG_S( "uga::pool::destroy", "joining threads..." ) ;
         for( i64_t i = 0; i < pool->pool.size; ++i )
         {
-                uga_thread * thread = *( ( uga_thread ** ) uga_vec_at_ptr( &pool->pool, i ) ) ;
+                uga_thread * thread = *( ( uga_thread ** ) uga_vec_at( &pool->pool, i ) ) ;
                 uga_thread_join( *thread ) ;
         }
         UGA_DBG_S( "uga::pool::destroy", "destroying resources..." ) ;
         for( i64_t i = 0; i < pool->pool.size; ++i )
         {
-                uga_thread * thread = *( uga_thread ** ) uga_vec_at_ptr( &pool->pool, i ) ;
+                uga_thread * thread = *( uga_thread ** ) uga_vec_at( &pool->pool, i ) ;
 
                 uga_str_destroy( &thread->task.data ) ;
                 uga_deallocate( thread ) ;

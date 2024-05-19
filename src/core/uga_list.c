@@ -33,7 +33,7 @@ uga_sl_list uga_sl_list_from_vector ( uga_vector const * vector )
 
         for( i64_t i = vector->size - 1; i >= 0; --i )
         {
-                uga_sl_list_push_front( &list, uga_vec_at_ptr( vector, i ) ) ;
+                uga_sl_list_push_front( &list, uga_vec_at( vector, i ) ) ;
         }
         return list ;
 }
