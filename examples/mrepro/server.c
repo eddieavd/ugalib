@@ -6,11 +6,11 @@
 
 #include <uganet.h>
 #include <net/uga_async.h>
-#include <net/uga_mplex.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define CLI_TCP 't'
 #define CLI_UDP 'u'
@@ -53,7 +53,7 @@ int main ( int argc, char ** argv )
         uga_string_view udp_port =       uga_sv_create_1( uga_cli_get_val( CLI_UDP, &args ) ) ;
         uga_string      payloads = uga_str_create_from_1( uga_cli_get_val( CLI_PLD, &args ) ) ;
 
-        UGA_INFO_S( "lab2::server", "config: tcp port : %s, udp port : %s, payloads : "STR_FMT, tcp_port, udp_port, STR_ARG( payloads ) ) ;
+        UGA_INFO_S( "lab2::server", "config: tcp port : "SV_FMT", udp port : "SV_FMT", payloads : "STR_FMT, SV_ARG( tcp_port ), SV_ARG( udp_port ), STR_ARG( payloads ) ) ;
 
         uga_socket tcp_sock = uga_sock_create_and_listen_configured( tcp_port, 16, &tcp_config ) ;
         uga_print_abort_if_err() ;
@@ -75,14 +75,13 @@ int main ( int argc, char ** argv )
 
         UGA_INFO_S( "lab2::server", "adding callbacks to multiplexer..." ) ;
 
-        uga_mplex_add_handler( &handlers, &tcp_cb_data ) ;
-        uga_mplex_add_handler( &handlers, &udp_cb_data ) ;
-        uga_mplex_add_handler( &handlers, &std_cb_data ) ;
+        uga_async_add_handler( &handlers, &tcp_cb_data ) ;
+        uga_async_add_handler( &handlers, &udp_cb_data ) ;
+        uga_async_add_handler( &handlers, &std_cb_data ) ;
 
         UGA_INFO_S( "lab2::server", "starting multiplexer..." ) ;
 
-
-        return uga_mplex_run( &handlers ) ;
+        return uga_async_run( &handlers ) ;
 }
 
 bool tcp_callback ( uga_callback * callback_data )
@@ -100,7 +99,7 @@ bool tcp_callback ( uga_callback * callback_data )
         if( uga_sv_equal( hello_msg, uga_sv_create_from( &message ) ) )
         {
                 UGA_INFO_S( "lab2::server::tcp_callback", "sent payloads" ) ;
-                uga_send_str( &client, payloads, 0 ) ;
+                uga_send_str( &client, uga_sv_create_from( payloads ), 0 ) ;
         }
         uga_sock_shutdown( &client, SHUT_RDWR ) ;
         uga_sock_close( &client ) ;
@@ -121,7 +120,7 @@ bool udp_callback ( uga_callback * callback_data )
         if( uga_sv_equal( hello_msg, uga_sv_create_from( &message ) ) )
         {
                 UGA_INFO_S( "lab2::server::udp_callback", "sent payloads" ) ;
-                uga_send_str_to( sock, payloads, 0 ) ;
+                uga_send_str_to( sock, uga_sv_create_from( payloads ), 0 ) ;
         }
         uga_str_destroy( &message ) ;
         return true ;

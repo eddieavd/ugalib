@@ -1,7 +1,10 @@
 # ugalib
 
 PROJECT = ugalib
-SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/net/uga_mplex.c src/core/uga_vector.c
+SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c src/core/uga_thread.c src/net/uga_tftp.c src/core/uga_pool.c
+
+SOURCES_CORE = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/core/uga_thread.c src/core/uga_pool.c
+SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c src/net/uga_tftp.c
 
 # CC  = clang-18
 # CXX = clang++-18
@@ -14,17 +17,17 @@ CC = zig cc -target aarch64-linux-gnu
 IDIR = ./include
 LDIR = ./lib
 
-CFLAGS   = -g -Wall -Wextra -pedantic -Werror -O0 -I$(IDIR)
+CFLAGS   = -g -Wall -Wextra -pedantic -Werror -O0 -I$(IDIR) -DUGA_LOG_LVL=99
 CXXFLAGS =
 CPPFLAGS =
-LDFLAGS  = -L$(LDIR) -luga
+LDFLAGS  = -L$(LDIR) -lugalib
 OBJECTS  = ${SOURCES:.c=.o}
 
 CLEANEXTS = o a
 
 BINDIR  = ./bin
 TESTDIR = ./bin/test
-LIBFILE = $(LDIR)/libuga.a
+LIBFILE = $(LDIR)/libugalib.a
 
 INSTALL_LDIR = /usr/lib
 INSTALL_IDIR = /usr/include/uga
@@ -32,7 +35,7 @@ INSTALL_IDIR = /usr/include/uga
 dir_guard = @mkdir -p $(@D)
 
 .PHONY: all
-all: $(LIBFILE) examples mrepro test
+all: $(LIBFILE) examples test
 
 .PHONY: libonly
 libonly: $(LIBFILE)
@@ -42,12 +45,6 @@ $(LIBFILE): $(OBJECTS)
 	ar ru $@ $^
 	ranlib $@
 
-.PHONY: mrepro
-mrepro: $(LIBFILE)
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) mrepro/bot.c    -o bot    $(LDFLAGS)
-	$(CC) $(CFLAGS) mrepro/server.c -o server $(LDFLAGS)
-
 .PHONY: examples
 examples: $(LIBFILE)
 	mkdir -p $(BINDIR)
@@ -56,6 +53,7 @@ examples: $(LIBFILE)
 	$(CC) $(CFLAGS) examples/server.c -o $(BINDIR)/server $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/files.c  -o $(BINDIR)/files  $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/string.c -o $(BINDIR)/string $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/uga.c    -o $(BINDIR)/uga    $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -76,11 +74,11 @@ install:
 .PHONY: clean
 clean:
 	for file in $(CLEANEXTS); do rm -f *.$$file; rm -f src/core/*.$$file; rm -f src/net/*.$$file; rm -f lib/*.$$file; rm -f ../lib/*$$file; done
-	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test bot server
+	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test
 
 .PHONY: cleanall
 cleanall:
 	for file in $(CLEANEXTS); do rm -f *.$$file; rm -f src/core/*.$$file; rm -f src/net/*.$$file; rm -f lib/*.$$file; rm -f ../lib/*$$file; done
-	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test bot server
+	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test
 	-rm -rf $(INSTALL_IDIR)
-	-rm -f $(INSTALL_LDIR)/libuga.a
+	-rm -f $(INSTALL_LDIR)/libugalib.a

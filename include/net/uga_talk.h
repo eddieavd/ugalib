@@ -8,6 +8,7 @@
 #define UGA_TALK_H_
 
 #include <core/uga_types.h>
+#include <core/uga_strview.h>
 #include <net/uga_sock.h>
 
 
@@ -16,8 +17,8 @@ struct uga_string_t ;
 i64_t uga_send    ( uga_socket const * sock, void const * data, i64_t const datalen, i32_t const flags ) ;
 i64_t uga_send_to ( uga_socket const * sock, void const * data, i64_t const datalen, i32_t const flags ) ;
 
-i64_t uga_send_str    ( uga_socket const * sock, struct uga_string_t const * message, i32_t const flags ) ;
-i64_t uga_send_str_to ( uga_socket const * sock, struct uga_string_t const * message, i32_t const flags ) ;
+i64_t uga_send_str    ( uga_socket const * sock, uga_string_view message, i32_t const flags ) ;
+i64_t uga_send_str_to ( uga_socket const * sock, uga_string_view message, i32_t const flags ) ;
 
 i64_t uga_recv      ( uga_socket const * sock, void       * dest, i64_t const destlen, i32_t const flags ) ;
 i64_t uga_recv_from ( uga_socket       * sock, void       * dest, i64_t const destlen, i32_t const flags ) ;

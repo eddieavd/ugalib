@@ -4,28 +4,47 @@
 //      uga_log.h
 //
 
-#ifndef UGA_NO_LOGS
-#include <core/uga_log_enable.def>
-#else
-#include <core/uga_log_disable.def>
-#endif
-
 #ifndef UGA_LOG_H_
 #define UGA_LOG_H_
+
+#include <core/uga_types.h>
+
+#define UGA_LOG_LVL_NONE 0
+#define UGA_LOG_LVL_ERR  2
+#define UGA_LOG_LVL_WARN 3
+#define UGA_LOG_LVL_INFO 4
+#define UGA_LOG_LVL_DBG  5
+
+#ifndef UGA_LOG_LVL
+#define UGA_LOG_LVL UGA_LOG_LVL_DBG
+#endif
+
+#include <core/uga_log.def>
+
+#include <stdio.h>
 
 
 typedef enum
 {
-        UGA_LVL_DBG  ,
-        UGA_LVL_INFO ,
-        UGA_LVL_WARN ,
-        UGA_LVL_ERR  ,
         UGA_LVL_SUCC ,
         UGA_LVL_FAIL ,
+        UGA_LVL_ERR  ,
+        UGA_LVL_WARN ,
+        UGA_LVL_INFO ,
+        UGA_LVL_DBG  ,
 } uga_log_lvl ;
+
+_timespec_t uga_time_empty     ( void ) ;
+_timespec_t uga_time_current   ( void ) ;
+_timespec_t uga_time_current_m ( void ) ;
 
 void uga_log_2 ( uga_log_lvl level,                     char const * fmt, ... ) ;
 void uga_log_3 ( uga_log_lvl level, char const * scope, char const * fmt, ... ) ;
+
+void uga_log_2_v ( uga_log_lvl level,                     char const * fmt, va_list args ) ;
+void uga_log_3_v ( uga_log_lvl level, char const * scope, char const * fmt, va_list args ) ;
+
+void uga_log_sys ( i32_t const level, i32_t const facility, char const * fmt, ... ) ;
 
 void uga_log_init ( void ) ;
 

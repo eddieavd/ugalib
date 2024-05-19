@@ -10,6 +10,7 @@
 #include <core/uga_err.h>
 
 #include <string.h>
+#include <ctype.h>
 
 
 uga_string_view uga_sv_create_0 ( void )
@@ -49,6 +50,19 @@ i32_t uga_sv_equal ( uga_string_view lhs, uga_string_view rhs )
         return 1 ;
 }
 
+i32_t uga_sv_equal_insensitive ( uga_string_view lhs, uga_string_view rhs )
+{
+        if( lhs.size != rhs.size ) return 0 ;
+
+        if( lhs.data == rhs.data ) return 1 ;
+
+        for( i64_t i = 0; i < lhs.size; ++i )
+        {
+                if( tolower( lhs.data[ i ] ) != tolower( rhs.data[ i ] ) ) return 0 ;
+        }
+        return 1 ;
+}
+
 i32_t uga_sv_starts_with ( uga_string_view this, uga_string_view prefix )
 {
         if( this.size < prefix.size ) return 0 ;
@@ -58,6 +72,19 @@ i32_t uga_sv_starts_with ( uga_string_view this, uga_string_view prefix )
         for( i64_t i = 0; i < prefix.size; ++i )
         {
                 if( this.data[ i ] != prefix.data[ i ] ) return 0 ;
+        }
+        return 1 ;
+}
+
+i32_t uga_sv_starts_with_insensitive ( uga_string_view this, uga_string_view prefix )
+{
+        if( this.size < prefix.size ) return 0 ;
+
+        if( this.data == prefix.data ) return 1 ;
+
+        for( i64_t i = 0; i < prefix.size; ++i )
+        {
+                if( tolower( this.data[ i ] ) != tolower( prefix.data[ i ] ) ) return 0 ;
         }
         return 1 ;
 }
@@ -73,6 +100,21 @@ i32_t uga_sv_ends_with ( uga_string_view this, uga_string_view suffix )
         for( i64_t i = 0; i < suffix.size; ++i )
         {
                 if( this.data[ start + i ] != suffix.data[ i ] ) return 0 ;
+        }
+        return 1 ;
+}
+
+i32_t uga_sv_ends_with_insensitive ( uga_string_view this, uga_string_view suffix )
+{
+        if( this.size < suffix.size ) return 0 ;
+
+        i64_t start = this.size - suffix.size ;
+
+        if( this.data + start == suffix.data ) return 1 ;
+
+        for( i64_t i = 0; i < suffix.size; ++i )
+        {
+                if( tolower( this.data[ start + i ] ) != tolower( suffix.data[ i ] ) ) return 0 ;
         }
         return 1 ;
 }

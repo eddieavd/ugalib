@@ -58,6 +58,30 @@ uga_string uga_str_create_from_2 ( char const * data, i64_t const datalen )
         return str ;
 }
 
+uga_string uga_str_assign_from_1 ( char * cstr )
+{
+        i64_t size = strlen( cstr ) ;
+
+        uga_string str = uga_str_create_0() ;
+
+        str.data     = cstr ;
+        str.size     = size ;
+        str.capacity = size ;
+
+        return str ;
+}
+
+uga_string uga_str_assign_from_2 ( char * data, i64_t const datalen )
+{
+        uga_string str = uga_str_create_0() ;
+
+        str.data     = data ;
+        str.size     = datalen ;
+        str.capacity = datalen ;
+
+        return str ;
+}
+
 uga_string uga_str_create_cstr ( uga_string_view source )
 {
         uga_string cstr = uga_str_create_1( source.size + 1 ) ;
@@ -94,12 +118,31 @@ uga_string uga_str_move ( uga_string * other )
         return str ;
 }
 
+uga_string * uga_str_new_copy ( uga_string other )
+{
+        uga_string * new_str = uga_allocate( sizeof( uga_string ) ) ;
+
+        *new_str = uga_str_copy( other ) ;
+
+        return new_str ;
+}
+
+uga_string * uga_str_new_move ( uga_string * other )
+{
+        uga_string * new_str = uga_allocate( sizeof( uga_string ) ) ;
+
+        *new_str = uga_str_move( other ) ;
+
+        return new_str ;
+}
+
 char       * uga_str_data  ( uga_string * str ) { return str->data ; }
 char const * uga_str_cdata ( uga_string   str ) { return str. data ; }
 
-i64_t uga_str_size     ( uga_string str ) { return str.      size ; }
-i64_t uga_str_capacity ( uga_string str ) { return str.  capacity ; }
-bool  uga_str_empty    ( uga_string str ) { return str.size == 0  ; }
+i64_t uga_str_size     ( uga_string str ) { return  str.      size ; }
+i64_t uga_str_capacity ( uga_string str ) { return  str.  capacity ; }
+bool  uga_str_empty    ( uga_string str ) { return  str.size == 0  ; }
+bool  uga_str_null     ( uga_string str ) { return !str.      data ; }
 
 i64_t uga_str_space_left ( uga_string str ) { return str.capacity - str.size ; }
 
@@ -163,7 +206,7 @@ void uga_str_append_cstr ( uga_string * str, char const * cstr )
 
 void uga_str_push_back ( uga_string * str, char const val )
 {
-        if( uga_str_empty( *str ) )
+        if( uga_str_null( *str ) )
         {
                 *str = uga_str_create_1( 1 ) ;
                 str->size = 1 ;
@@ -179,7 +222,7 @@ void uga_str_push_back ( uga_string * str, char const val )
 
 void uga_str_append ( uga_string * str, char const * data, i64_t const datalen )
 {
-        if( uga_str_empty( *str ) )
+        if( uga_str_null( *str ) )
         {
                 *str = uga_str_create_from_2( data, datalen ) ;
                 return ;

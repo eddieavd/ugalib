@@ -35,6 +35,7 @@ i32_t uga_cli_parse_args ( i32_t argc, char ** argv, uga_cli_args * args )
                 if( arg == '?' )
                 {
                         uga_set_cli_error( UGA_ERR_CLI ) ;
+                        uga_str_destroy( &opts_str ) ;
                         return -1 ;
                 }
                 for( i32_t i = 0; i < args->arg_count; ++i )
@@ -55,7 +56,6 @@ i32_t uga_cli_parse_args ( i32_t argc, char ** argv, uga_cli_args * args )
                         }
                 }
         }
-
         uga_str_destroy( &opts_str ) ;
         return parsed_args ;
 }
