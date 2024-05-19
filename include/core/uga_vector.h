@@ -9,9 +9,10 @@
 
 #include <core/uga_types.h>
 
-#define uga_vec_create_0( type            ) _uga_vec_create_0(            sizeof( type ) )
-#define uga_vec_create_1( type, cap       ) _uga_vec_create_1( cap,       sizeof( type ) )
-#define uga_vec_create_2( type, cap, dtor ) _uga_vec_create_2( cap, dtor, sizeof( type ) )
+#define uga_vec_create_0(   type            ) _uga_vec_create_0(              sizeof( type ) )
+#define uga_vec_create_1(   type, cap       ) _uga_vec_create_1(   cap,       sizeof( type ) )
+#define uga_vec_create_d_0( type,      dtor ) _uga_vec_create_d_0(      dtor, sizeof( type ) )
+#define uga_vec_create_d_1( type, cap, dtor ) _uga_vec_create_d_1( cap, dtor, sizeof( type ) )
 
 
 struct uga_vector_t
@@ -25,9 +26,11 @@ struct uga_vector_t
 } ;
 typedef struct uga_vector_t uga_vector ;
 
-uga_vector _uga_vec_create_0 (                                           i64_t elem_size ) ;
-uga_vector _uga_vec_create_1 ( i64_t capacity,                           i64_t elem_size ) ;
-uga_vector _uga_vec_create_2 ( i64_t capacity, void ( *dtor )( void * ), i64_t elem_size ) ;
+uga_vector _uga_vec_create_0 (                 i64_t elem_size ) ;
+uga_vector _uga_vec_create_1 ( i64_t capacity, i64_t elem_size ) ;
+
+uga_vector _uga_vec_create_d_0 (                 void ( *dtor )( void * ), i64_t elem_size ) ;
+uga_vector _uga_vec_create_d_1 ( i64_t capacity, void ( *dtor )( void * ), i64_t elem_size ) ;
 
 uga_vector uga_vec_copy ( uga_vector const * other ) ;
 uga_vector uga_vec_move ( uga_vector       * other ) ;

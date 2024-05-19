@@ -30,9 +30,11 @@ void uga_async_read ( uga_callback * callback )
 
 void uga_async_add_handler ( uga_handler_list * handler_list, uga_callback const * callback )
 {
+        uga_clr_errs() ;
+
         if( handler_list->num_handlers >= UGA_MAX_HANDLERS )
         {
-                // set error
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, UGA_MAX_HANDLERS, UGA_MAX_HANDLERS ) ;
                 return ;
         }
         handler_list->handlers[ handler_list->num_handlers++ ] = *callback ;

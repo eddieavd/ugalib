@@ -50,7 +50,7 @@ static inline void test_vec ( void )
                                    vec_1.size, vec_1.capacity
                         ) ;
                 }
-                uga_vector vec_2 = uga_vec_create_2( uga_string, 8, uga_str_destroy_void ) ;
+                uga_vector vec_2 = uga_vec_create_d_1( uga_string, 8, uga_str_destroy_void ) ;
 
                 if( !test_log( "test::vec::create_2", vec_2.data != NULL && vec_2.size == 0 && vec_2.capacity == 8 ) )
                 {

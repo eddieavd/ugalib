@@ -29,7 +29,16 @@ uga_vector _uga_vec_create_1 ( i64_t capacity, i64_t elem_size )
         return vec ;
 }
 
-uga_vector _uga_vec_create_2 ( i64_t capacity, void ( *dtor )( void * ), i64_t elem_size )
+uga_vector _uga_vec_create_d_0 ( void ( *dtor )( void * ), i64_t elem_size )
+{
+        uga_vector vec = _uga_vec_create_0( elem_size ) ;
+
+        vec.elem_dtor = dtor ;
+
+        return vec ;
+}
+
+uga_vector _uga_vec_create_d_1 ( i64_t capacity, void ( *dtor )( void * ), i64_t elem_size )
 {
         uga_vector vec = _uga_vec_create_1( capacity, elem_size ) ;
 
@@ -54,13 +63,9 @@ uga_vector uga_vec_copy ( uga_vector const * other )
 
 uga_vector uga_vec_move ( uga_vector * other )
 {
-        uga_vector vec = _uga_vec_create_0( other->elem_size ) ;
+        uga_vector vec = *other ;
 
-        vec.    data = other->    data ;
-        vec.    size = other->    size ;
-        vec.capacity = other->capacity ;
-
-        *other = _uga_vec_create_0( other->elem_size ) ;
+        *other = _uga_vec_create_0( vec.elem_size ) ;
 
         return vec ;
 }
@@ -188,21 +193,15 @@ void uga_vec_clear ( uga_vector * this )
                         this->elem_dtor( uga_vec_at( this, i ) ) ;
                 }
         }
-        memset( this->data, 0, this->capacity * this->elem_size ) ;
         this->size = 0 ;
 }
 
 void uga_vec_destroy ( uga_vector * this )
 {
+        uga_vec_clear( this ) ;
+
         if( this->data )
         {
-                if( this->elem_dtor )
-                {
-                        for( i64_t i = 0; i < this->size; ++i )
-                        {
-                                this->elem_dtor( uga_vec_at( this, i ) ) ;
-                        }
-                }
                 uga_deallocate( this->data ) ;
         }
         *this = _uga_vec_create_0( this->elem_size ) ;

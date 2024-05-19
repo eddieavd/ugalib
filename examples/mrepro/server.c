@@ -5,6 +5,7 @@
 //
 
 #include <uganet.h>
+#include <core/uga_cli.h>
 #include <net/uga_async.h>
 
 #include <stdio.h>
