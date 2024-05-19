@@ -9,8 +9,10 @@
 
 #include <core/uga_types.h>
 
-#define uga_sl_list_create( type ) _uga_sl_list_create( sizeof( type ) )
-#define uga_dl_list_create( type ) _uga_dl_list_create( sizeof( type ) )
+#define uga_sl_list_create(   type       ) _uga_sl_list_create(         sizeof( type ) )
+#define uga_dl_list_create(   type       ) _uga_dl_list_create(         sizeof( type ) )
+#define uga_sl_list_create_d( type, dtor ) _uga_sl_list_create_d( dtor, sizeof( type ) )
+#define uga_dl_list_create_d( type, dtor ) _uga_dl_list_create_d( dtor, sizeof( type ) )
 
 
 struct uga_vector_t ;
@@ -19,6 +21,7 @@ struct uga_sl_node_t
 {
         void                 * data ;
         struct uga_sl_node_t * next ;
+        void    ( *dtor )( void * ) ;
 } ;
 typedef struct uga_sl_node_t uga_sl_node ;
 
@@ -27,11 +30,14 @@ struct uga_sl_list_t
         uga_sl_node * head ;
         i64_t         size ;
         i64_t    elem_size ;
+
+        void ( *elem_dtor )( void * ) ;
 } ;
 typedef struct uga_sl_list_t uga_sl_list ;
 
 
-uga_sl_list _uga_sl_list_create ( i64_t const elem_size ) ;
+uga_sl_list _uga_sl_list_create   (                           i64_t const elem_size ) ;
+uga_sl_list _uga_sl_list_create_d ( void ( *dtor )( void * ), i64_t const elem_size ) ;
 
 uga_sl_list uga_sl_list_from_vector ( struct uga_vector_t const * vector ) ;
 
@@ -59,6 +65,7 @@ struct uga_dl_node_t
         void                 * data ;
         struct uga_dl_node_t * prev ;
         struct uga_dl_node_t * next ;
+        void    ( *dtor )( void * ) ;
 } ;
 typedef struct uga_dl_node_t uga_dl_node ;
 
@@ -67,11 +74,16 @@ struct uga_dl_list_t
         uga_dl_node * head ;
         i64_t         size ;
         i64_t    elem_size ;
+
+        void ( *elem_dtor )( void * ) ;
 } ;
 typedef struct uga_dl_list_t uga_dl_list ;
 
 
-uga_dl_list _uga_dl_list_create ( i64_t const elem_size ) ;
+uga_dl_list _uga_dl_list_create   (                           i64_t const elem_size ) ;
+uga_dl_list _uga_dl_list_create_d ( void ( *dtor )( void * ), i64_t const elem_size ) ;
+
+uga_dl_list uga_dl_list_from_vector ( struct uga_vector_t const * vector ) ;
 
 void uga_dl_list_push_back  ( uga_dl_list * this, void * data ) ;
 void uga_dl_list_push_front ( uga_dl_list * this, void * data ) ;
