@@ -51,6 +51,7 @@ typedef  mtx_t uga_mtx_t     ;
 typedef  cnd_t uga_cnd_t     ;
 
 typedef struct timespec _timespec_t ;
+typedef struct timeval  _timeval_t  ;
 
 
 #endif // UGA_TYPES_H_
