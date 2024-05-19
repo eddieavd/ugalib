@@ -75,7 +75,7 @@ i64_t uga_vec_space_left ( uga_vector const * this )
         return this->capacity - this->size ;
 }
 
-void * uga_vec_at_ptr ( uga_vector const * this, i64_t const index )
+void * uga_vec_at ( uga_vector const * this, i64_t const index )
 {
         uga_clr_errs() ;
 
@@ -87,9 +87,9 @@ void * uga_vec_at_ptr ( uga_vector const * this, i64_t const index )
         return ( char * ) this->data + ( index * this->elem_size ) ;
 }
 
-void uga_vec_at ( uga_vector const * this, i64_t const index, void * dest )
+void uga_vec_get_at ( uga_vector const * this, i64_t const index, void * dest )
 {
-        void * elem_ptr = uga_vec_at_ptr( this, index ) ;
+        void * elem_ptr = uga_vec_at( this, index ) ;
         UGA_RETURN_ON_ERR() ;
         memcpy( dest, elem_ptr, this->elem_size ) ;
 }
@@ -144,7 +144,7 @@ void uga_vec_erase ( uga_vector * this, i64_t const index )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return ;
         }
-        void * to_erase = uga_vec_at_ptr( this, index ) ;
+        void * to_erase = uga_vec_at( this, index ) ;
 
         if( this->elem_dtor )
         {
@@ -152,7 +152,7 @@ void uga_vec_erase ( uga_vector * this, i64_t const index )
         }
         if( index < this->size - 1 )
         {
-                void * last_elem = uga_vec_at_ptr( this, this->size - 1 ) ;
+                void * last_elem = uga_vec_at( this, this->size - 1 ) ;
                 memcpy( to_erase, last_elem, this->elem_size ) ;
         }
         --this->size ;
@@ -167,7 +167,7 @@ void uga_vec_erase_stable ( uga_vector * this, i64_t const index )
                 uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
                 return ;
         }
-        void * to_erase = uga_vec_at_ptr( this, index ) ;
+        void * to_erase = uga_vec_at( this, index ) ;
         if( this->elem_dtor )
         {
                 this->elem_dtor( to_erase ) ;
@@ -181,6 +181,13 @@ void uga_vec_erase_stable ( uga_vector * this, i64_t const index )
 
 void uga_vec_clear ( uga_vector * this )
 {
+        if( this->elem_dtor )
+        {
+                for( i64_t i = 0; i < this->size; ++i )
+                {
+                        this->elem_dtor( uga_vec_at( this, i ) ) ;
+                }
+        }
         memset( this->data, 0, this->capacity * this->elem_size ) ;
         this->size = 0 ;
 }
@@ -193,7 +200,7 @@ void uga_vec_destroy ( uga_vector * this )
                 {
                         for( i64_t i = 0; i < this->size; ++i )
                         {
-                                this->elem_dtor( ( char * ) this->data + ( i * this->elem_size ) ) ;
+                                this->elem_dtor( uga_vec_at( this, i ) ) ;
                         }
                 }
                 uga_deallocate( this->data ) ;
