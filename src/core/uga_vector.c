@@ -135,6 +135,50 @@ void uga_vec_push_back ( uga_vector * this, void * value )
         ++this->size ;
 }
 
+void uga_vec_erase ( uga_vector * this, i64_t const index )
+{
+        uga_clr_errs() ;
+
+        if( index < 0 || index >= this->size )
+        {
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
+                return ;
+        }
+        void * to_erase = uga_vec_at_ptr( this, index ) ;
+
+        if( this->elem_dtor )
+        {
+                this->elem_dtor( to_erase ) ;
+        }
+        if( index < this->size - 1 )
+        {
+                void * last_elem = uga_vec_at_ptr( this, this->size - 1 ) ;
+                memcpy( to_erase, last_elem, this->elem_size ) ;
+        }
+        --this->size ;
+}
+
+void uga_vec_erase_stable ( uga_vector * this, i64_t const index )
+{
+        uga_clr_errs() ;
+
+        if( index < 0 || index >= this->size )
+        {
+                uga_set_mem_error( UGA_ERR_BAD_ACCESS, this->size, index ) ;
+                return ;
+        }
+        void * to_erase = uga_vec_at_ptr( this, index ) ;
+        if( this->elem_dtor )
+        {
+                this->elem_dtor( to_erase ) ;
+        }
+        if( index < this->size - 1 )
+        {
+                memmove( to_erase, ( char * ) to_erase + this->elem_size, ( this->size - index + 1 ) * this->elem_size ) ;
+        }
+        --this->size ;
+}
+
 void uga_vec_clear ( uga_vector * this )
 {
         memset( this->data, 0, this->capacity * this->elem_size ) ;

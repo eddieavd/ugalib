@@ -42,6 +42,9 @@ void uga_vec_shrink_to_fit ( uga_vector * this                       ) ;
 
 void uga_vec_push_back ( uga_vector * this, void * value ) ;
 
+void uga_vec_erase        ( uga_vector * this, i64_t const index ) ;
+void uga_vec_erase_stable ( uga_vector * this, i64_t const index ) ;
+
 void uga_vec_clear   ( uga_vector * this ) ;
 void uga_vec_destroy ( uga_vector * this ) ;
 
