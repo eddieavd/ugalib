@@ -12,14 +12,14 @@
 #endif
 
 #include <core/uga_types.h>
-#include <core/uga_str.h>
+#include <core/uga_vector.h>
 
 #include <threads.h>
 
 
 struct uga_task_t
 {
-        uga_string data ;
+        uga_vector data ;
         i32_t ( *run )( void * ) ;
 } ;
 typedef struct uga_task_t uga_task ;

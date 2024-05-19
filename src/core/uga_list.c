@@ -264,12 +264,22 @@ bool uga_sl_list_empty ( uga_sl_list const * list )
         return list->size == 0 ;
 }
 
-void uga_sl_list_destroy ( uga_sl_list * this )
+void uga_sl_list_clear ( uga_sl_list * this )
 {
         while( this->size )
         {
                 uga_sl_list_pop_front( this, NULL ) ;
         }
+}
+
+void uga_sl_list_destroy ( uga_sl_list * this )
+{
+        uga_sl_list_clear( this ) ;
+}
+
+void uga_sl_list_destroy_void ( void * this )
+{
+        uga_sl_list_destroy( this ) ;
 }
 
 uga_sl_node * _uga_sl_node_create ( void ( *dtor )( void * ), i64_t const elem_size )
@@ -563,12 +573,22 @@ bool uga_dl_list_empty ( uga_dl_list const * this )
         return this->size == 0 ;
 }
 
-void uga_dl_list_destroy ( uga_dl_list * this )
+void uga_dl_list_clear ( uga_dl_list * this )
 {
         while( this->size )
         {
                 uga_dl_list_pop_front( this, NULL ) ;
         }
+}
+
+void uga_dl_list_destroy ( uga_dl_list * this )
+{
+        uga_dl_list_clear( this ) ;
+}
+
+void uga_dl_list_destroy_void ( void * this )
+{
+        uga_dl_list_destroy( this ) ;
 }
 
 uga_dl_node * _uga_dl_node_create ( void ( *dtor )( void * ), i64_t const elem_size )

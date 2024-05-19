@@ -22,17 +22,20 @@ uga_thread_pool * uga_pool_create_new ( i32_t const num_threads )
 
         poolptr->is_active = true ;
 
-        poolptr->tasks = uga_dl_list_create( uga_task ) ;
-        poolptr-> pool = uga_vec_create_1( uga_thread *, num_threads ) ;
+        poolptr->tasks  = uga_dl_list_create( uga_task ) ;
+        poolptr->t_done = uga_dl_list_create( uga_task ) ;
+        poolptr-> pool  = uga_vec_create_1( uga_thread *, num_threads ) ;
 
         UGA_DBG_S( "uga::pool::create_new", "allocated task and thread vectors" ) ;
 
         poolptr->task_mtx = uga_mtx_init( UGA_MTX_PLAIN ) ;
+        poolptr->done_mtx = uga_mtx_init( UGA_MTX_PLAIN ) ;
         poolptr->   t_sem = uga_sem_init(             0 ) ;
 
         UGA_DBG_S( "uga::pool::create_new", "initialized mutex and condition members" ) ;
 
-        uga_string poll_data = uga_str_create_from_2( ( char const * ) &poolptr, sizeof( void * ) ) ;
+        uga_vector poll_data = uga_vec_create_1( uga_thread_pool *, 1 ) ;
+        uga_vec_push_back( &poll_data, &poolptr ) ;
 
         uga_task poll_task = { poll_data, _uga_pool_poll } ;
 
@@ -46,7 +49,7 @@ uga_thread_pool * uga_pool_create_new ( i32_t const num_threads )
         }
         UGA_DBG_S( "uga::pool::create_new", "created %lld threads", poolptr->pool.size ) ;
 
-        uga_str_destroy( &poll_data ) ;
+        uga_vec_destroy( &poll_data ) ;
 
         return poolptr ;
 }
@@ -67,8 +70,9 @@ i32_t _uga_pool_poll ( void * parent_pool_ptr )
 {
         UGA_DBG_S( "worker::uga::pool::poll", "started." ) ;
 
-        uga_string * task_data =  ( uga_string       * ) parent_pool_ptr ;
-        uga_thread_pool * pool = *( uga_thread_pool ** ) task_data->data ;
+        uga_vector * task_data = ( uga_vector * ) parent_pool_ptr ;
+        UGA_DBG_S( "worker::uga::pool::poll", "incoming data vector size is %lld", task_data->size ) ;
+        uga_thread_pool * pool = *( uga_thread_pool ** ) uga_vec_at( task_data, 0 ) ;
 
         UGA_DBG_S( "worker::uga::pool::poll", "retrieved pointer to pool." ) ;
 
@@ -99,10 +103,25 @@ i32_t _uga_pool_poll ( void * parent_pool_ptr )
                         UGA_DBG_S( "worker::uga::pool::poll", "executing task..." ) ;
                         task.run( &task.data ) ;
                         UGA_DBG_S( "worker::uga::pool::poll", "task finished." ) ;
+                        uga_mtx_acquire( &pool->done_mtx ) ;
+                        uga_dl_list_push_back( &pool->t_done, &task ) ;
+                        uga_mtx_release( &pool->done_mtx ) ;
                 }
         }
         UGA_DBG_S( "worker::uga::pool::poll", "finished." ) ;
         return 0 ;
+}
+
+uga_dl_list * uga_pool_get_finished_tasks ( uga_thread_pool * pool )
+{
+        return &pool->t_done ;
+}
+
+void uga_pool_clear_finished_tasks ( uga_thread_pool * pool )
+{
+        uga_mtx_acquire( &pool->done_mtx ) ;
+        uga_dl_list_clear( &pool->t_done ) ;
+        uga_mtx_release( &pool->done_mtx ) ;
 }
 
 void uga_pool_destroy ( uga_thread_pool * pool )
@@ -123,13 +142,15 @@ void uga_pool_destroy ( uga_thread_pool * pool )
         {
                 uga_thread * thread = *( uga_thread ** ) uga_vec_at( &pool->pool, i ) ;
 
-                uga_str_destroy( &thread->task.data ) ;
+                uga_vec_destroy( &thread->task.data ) ;
                 uga_deallocate( thread ) ;
         }
-        uga_vec_destroy( &pool->     pool ) ;
-        uga_dl_list_destroy( &pool->tasks ) ;
-        uga_mtx_destroy( &pool-> task_mtx ) ;
-        uga_sem_destroy( &pool->    t_sem ) ;
+        uga_vec_destroy( &pool->      pool ) ;
+        uga_dl_list_destroy( &pool-> tasks ) ;
+        uga_dl_list_destroy( &pool->t_done ) ;
+        uga_mtx_destroy( &pool->  task_mtx ) ;
+        uga_mtx_destroy( &pool->  done_mtx ) ;
+        uga_sem_destroy( &pool->     t_sem ) ;
 
         uga_deallocate( pool ) ;
 }

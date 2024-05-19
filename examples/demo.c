@@ -55,25 +55,13 @@ i32_t work ( void * data )
 i32_t work_1 ( void * arg )
 {
         UGA_INFO_S( "worker", "started." ) ;
-        uga_string * data = ( uga_string * ) arg ;
+        uga_vector * task_data = ( uga_vector * ) arg ;
+        UGA_INFO_S( "worker", "got pointer to vector, size is %lld", task_data->size ) ;
+        uga_string * data = uga_vec_at( task_data, 0 ) ;
 
         UGA_INFO_S( "worker", "worker %lld printing main message: "STR_FMT, uga_thread_self(), STR_ARG( *data ) ) ;
 
         uga_thread_sleep_ms( 50 ) ;
-
-        UGA_INFO_S( "worker", "finished." ) ;
-
-        return 0 ;
-}
-
-i32_t work_2 ( void * arg )
-{
-        UGA_INFO_S( "worker", "started." ) ;
-        uga_string * data = ( uga_string * ) arg ;
-
-        UGA_INFO_S( "worker", "worker %lld printing alternative message: "STR_FMT, uga_thread_self(), STR_ARG( *data ) ) ;
-
-        uga_thread_sleep_ms( 75 ) ;
 
         UGA_INFO_S( "worker", "finished." ) ;
 
@@ -100,12 +88,22 @@ int main ( i32_t argc, char ** argv )
         uga_string message_3 = uga_str_create_from_1( "MSG_C" ) ;
         uga_string message_4 = uga_str_create_from_1( "MSG_D" ) ;
 
+        uga_vector vec_1 = uga_vec_create_1( uga_string, 1 ) ;
+        uga_vector vec_2 = uga_vec_create_1( uga_string, 1 ) ;
+        uga_vector vec_3 = uga_vec_create_1( uga_string, 1 ) ;
+        uga_vector vec_4 = uga_vec_create_1( uga_string, 1 ) ;
+
+        uga_vec_push_back( &vec_1, &message_1 ) ;
+        uga_vec_push_back( &vec_2, &message_2 ) ;
+        uga_vec_push_back( &vec_3, &message_3 ) ;
+        uga_vec_push_back( &vec_4, &message_4 ) ;
+
         UGA_INFO_S( "main", "created messages" ) ;
 
-        uga_task task_1 = { message_1, work_1 } ;
-        uga_task task_2 = { message_2, work_2 } ;
-        uga_task task_3 = { message_3, work_1 } ;
-        uga_task task_4 = { message_4, work_2 } ;
+        uga_task task_1 = { vec_1, work_1 } ;
+        uga_task task_2 = { vec_2, work_1 } ;
+        uga_task task_3 = { vec_3, work_1 } ;
+        uga_task task_4 = { vec_4, work_1 } ;
 
         UGA_INFO_S( "main", "created tasks" ) ;
         UGA_INFO_S( "main", "adding tasks..." ) ;

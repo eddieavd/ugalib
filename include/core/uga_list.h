@@ -57,7 +57,10 @@ void   uga_sl_list_insert_at ( uga_sl_list * this, i64_t const index, void * dat
 
 bool uga_sl_list_empty ( uga_sl_list const * this ) ;
 
-void uga_sl_list_destroy ( uga_sl_list * this ) ;
+void uga_sl_list_clear ( uga_sl_list * this ) ;
+
+void uga_sl_list_destroy      ( uga_sl_list * this ) ;
+void uga_sl_list_destroy_void ( void        * this ) ;
 
 
 struct uga_dl_node_t
@@ -101,7 +104,10 @@ void   uga_dl_list_insert_at ( uga_dl_list * this, i64_t const index, void * dat
 
 bool uga_dl_list_empty ( uga_dl_list const * this ) ;
 
-void uga_dl_list_destroy ( uga_dl_list * this ) ;
+void uga_dl_list_clear ( uga_dl_list * this ) ;
+
+void uga_dl_list_destroy      ( uga_dl_list * this ) ;
+void uga_dl_list_destroy_void ( void        * this ) ;
 
 
 #endif // UGA_LIST_H_

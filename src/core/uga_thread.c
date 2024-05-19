@@ -18,8 +18,8 @@ uga_thread * uga_thread_do_task ( uga_task task )
         uga_thread * thread = uga_allocate( sizeof( uga_thread ) ) ;
 
         thread->id = -1 ;
-        thread->task.data = uga_str_copy( task.data ) ;
-        thread->task. run =               task. run   ;
+        thread->task.data = uga_vec_copy( &task.data ) ;
+        thread->task. run =                task. run   ;
         i32_t err = thrd_create( &thread->id, thread->task.run, &thread->task.data ) ;
         _uga_check_thrd_err( err, thread->id ) ;
 
