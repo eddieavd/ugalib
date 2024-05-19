@@ -15,7 +15,7 @@ SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c src/net
 CC = zig cc -target aarch64-linux-gnu
 
 IDIR = ./include
-LDIR = ./../lib
+LDIR = ./lib
 
 CFLAGS   = -g -Wall -Wextra -pedantic -Werror -O0 -I$(IDIR) -DUGA_LOG_LVL=99
 CXXFLAGS =
@@ -53,6 +53,7 @@ examples: $(LIBFILE)
 	$(CC) $(CFLAGS) examples/server.c -o $(BINDIR)/server $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/files.c  -o $(BINDIR)/files  $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/string.c -o $(BINDIR)/string $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/uga.c    -o $(BINDIR)/uga    $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

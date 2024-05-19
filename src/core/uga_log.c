@@ -107,7 +107,7 @@ void uga_log_2_v ( uga_log_lvl level, char const * fmt, va_list args )
                         fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::FAIL : ", uga_log_red(), uga_log_bold(), STR_ARG( time ), uga_thread_self() ) ;
                         break ;
                 default:
-                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::LOG  : ", uga_log_white(), uga_log_dim(),STR_ARG( time ), uga_thread_self() ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::%4d : ", uga_log_red(), uga_log_dim(),STR_ARG( time ), uga_thread_self(), level ) ;
                         break ;
         }
         fprintf( stderr, "%s", uga_log_reset() ) ;
@@ -145,7 +145,7 @@ void uga_log_3_v ( uga_log_lvl level, char const * scope, char const * fmt, va_l
                         fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::FAIL : %s : ", uga_log_red(), uga_log_bold(), STR_ARG( time ), uga_thread_self(), scope ) ;
                         break ;
                 default:
-                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::LOG  : %s : ", uga_log_white(), uga_log_dim(), STR_ARG( time ), uga_thread_self(), scope ) ;
+                        fprintf( stderr, "%s%s:: "STR_FMT" : %lu : UGA::%.4d : %s : ", uga_log_red(), uga_log_dim(), STR_ARG( time ), uga_thread_self(), level, scope ) ;
                         break ;
         }
         fprintf( stderr, "%s", uga_log_reset() ) ;
