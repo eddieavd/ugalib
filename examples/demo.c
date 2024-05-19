@@ -17,7 +17,6 @@
 #include <net/uga_sock.h>
 #include <net/uga_talk.h>
 #include <net/uga_async.h>
-#include <net/uga_tftp.h>
 
 #define CLI_ARGC    1
 #define CLI_DAEMON 'd'
@@ -41,7 +40,7 @@ i32_t work ( void * data )
 
         for( i64_t i = 0; i < nums.size; ++i )
         {
-                i64_t * val = uga_vec_at_ptr( &nums, i ) ;
+                i64_t * val = uga_vec_at( &nums, i ) ;
                 UGA_DBG_S( "worker::loop", "current value is %lld", *val ) ;
                 *val += 1 ;
                 UGA_DBG_S( "worker::loop", "new value is %lld", *val ) ;
@@ -134,7 +133,6 @@ int main ( i32_t argc, char ** argv )
         UGA_INFO_S( "main", "waiting for workers..." ) ;
         uga_pool_destroy( pool ) ;
         UGA_INFO_S( "main", "destroying resources..." ) ;
-        uga_deallocate( pool ) ;
         uga_str_destroy( &message_1 ) ;
         uga_str_destroy( &message_2 ) ;
         uga_str_destroy( &message_3 ) ;
@@ -168,14 +166,14 @@ int main ( i32_t argc, char ** argv )
         UGA_DBG_S( "main", "joining threads..." ) ;
         for( i64_t i = 0; i < threads.size; ++i )
         {
-                uga_thread * thread = uga_vec_at_ptr( &threads, i ) ;
+                uga_thread * thread = uga_vec_at( &threads, i ) ;
                 uga_thread_join( *thread ) ;
         }
         UGA_DBG_S( "main", "threads joined." ) ;
         UGA_DBG_S( "main", "checking results..." ) ;
         for( i64_t i = 0; i < threads.size; ++i )
         {
-                uga_thread * thread = uga_vec_at_ptr( &threads, i ) ;
+                uga_thread * thread = uga_vec_at( &threads, i ) ;
 
                 UGA_DBG_S( "main", "checking thread %llu...", thread->id ) ;
 
@@ -183,7 +181,7 @@ int main ( i32_t argc, char ** argv )
 
                 for( i64_t j = 0; j < thread_data->size; ++j )
                 {
-                        i64_t * val = uga_vec_at_ptr( thread_data, j ) ;
+                        i64_t * val = uga_vec_at( thread_data, j ) ;
 
                         UGA_DBG_S( "main", "value at index %lld is %lld", j, *val ) ;
 
