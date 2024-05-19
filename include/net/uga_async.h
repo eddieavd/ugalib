@@ -35,8 +35,8 @@ typedef struct
 void uga_async_add_handler    ( uga_handler_list * handler_list, uga_callback const * callback ) ;
 void uga_async_remove_handler ( uga_handler_list * handler_list, uga_socket   const *   socket ) ;
 
-i32_t uga_async_has_ready ( uga_handler_list * handler_list ) ;
-i32_t uga_async_run       ( uga_handler_list * handler_list ) ;
+uga_socket uga_async_has_ready ( uga_handler_list * handler_list ) ;
+i32_t      uga_async_run       ( uga_handler_list * handler_list ) ;
 
 
 

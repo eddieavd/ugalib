@@ -51,9 +51,9 @@ void uga_async_remove_handler ( uga_handler_list * handler_list, uga_socket cons
         }
 }
 
-i32_t uga_async_has_ready ( uga_handler_list * handler_list )
+uga_socket uga_async_has_ready ( uga_handler_list * handler_list )
 {
-        fd_set fds ;
+        fd_set fds, fdr ;
         FD_ZERO( &fds ) ;
 
         i32_t max_fd = 0 ;
@@ -66,7 +66,21 @@ i32_t uga_async_has_ready ( uga_handler_list * handler_list )
                 if( fd > max_fd ) max_fd = fd ;
         }
         struct timeval time = { 0, 0 } ;
-        return select( max_fd + 1, &fds, NULL, NULL, &time ) > 0 ;
+        if( fdr = fds, select( max_fd + 1, &fdr, NULL, NULL, &time ) > 0 )
+        {
+                for( i32_t i = 0; i < handler_list->num_handlers; ++i )
+                {
+                        if( FD_ISSET( handler_list->handlers[ i ].sock->sockfd, &fdr ) )
+                        {
+                                UGA_WARN_S( "uga::async::has_ready", "socket %d ready", handler_list->handlers[ i ].sock->sockfd ) ;
+                                return *handler_list->handlers[ i ].sock ;
+                        }
+                }
+        }
+        uga_socket empty = { 0 } ;
+        empty.sockfd = -1 ;
+
+        return empty ;
 }
 
 i32_t uga_async_run ( uga_handler_list * handler_list )
