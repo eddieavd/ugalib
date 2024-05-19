@@ -22,7 +22,7 @@ uga_thread_pool * uga_pool_create_new ( i32_t const num_threads )
 
         poolptr->is_active = true ;
 
-        poolptr->tasks = uga_vec_create_1( uga_task    ,          16 ) ;
+        poolptr->tasks = uga_dl_list_create( uga_task ) ;
         poolptr-> pool = uga_vec_create_1( uga_thread *, num_threads ) ;
 
         UGA_DBG_S( "uga::pool::create_new", "allocated task and thread vectors" ) ;
@@ -55,7 +55,7 @@ void uga_pool_add_task ( uga_thread_pool * pool, uga_task task )
 {
         uga_mtx_acquire( &pool->task_mtx ) ;
 
-        uga_vec_push_back( &pool->tasks, &task ) ;
+        uga_dl_list_push_back( &pool->tasks, &task ) ;
         UGA_DBG_S( "uga::pool::add_task", "pushed task to queue" ) ;
 
         uga_sem_release( &pool->   t_sem ) ;
@@ -86,11 +86,10 @@ i32_t _uga_pool_poll ( void * parent_pool_ptr )
                         uga_mtx_release( &pool->task_mtx ) ;
                         break ;
                 }
-                if( !uga_vec_empty( &pool->tasks ) )
+                if( !uga_dl_list_empty( &pool->tasks ) )
                 {
                         UGA_DBG_S( "worker::uga:pool::poll", "found a task." ) ;
-                        task = *( uga_task * ) uga_vec_at_ptr( &pool->tasks, 0 ) ;
-                        uga_vec_erase_stable( &pool->tasks, 0 ) ;
+                        uga_dl_list_pop_front( &pool->tasks, &task ) ;
                 }
                 uga_mtx_release( &pool->task_mtx ) ;
                 UGA_DBG_S( "worker::uga::pool::poll", "released mutex." ) ;
@@ -128,9 +127,11 @@ void uga_pool_destroy ( uga_thread_pool * pool )
                 uga_deallocate( thread ) ;
         }
         uga_vec_destroy( &pool->     pool ) ;
-        uga_vec_destroy( &pool->    tasks ) ;
+        uga_dl_list_destroy( &pool->tasks ) ;
         uga_mtx_destroy( &pool-> task_mtx ) ;
         uga_sem_destroy( &pool->    t_sem ) ;
+
+        uga_deallocate( pool ) ;
 }
 
 void uga_pool_destroy_void ( void * pool )

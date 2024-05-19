@@ -17,7 +17,6 @@
 #include <net/uga_sock.h>
 #include <net/uga_talk.h>
 #include <net/uga_async.h>
-#include <net/uga_tftp.h>
 
 #define CLI_ARGC    1
 #define CLI_DAEMON 'd'
@@ -134,7 +133,6 @@ int main ( i32_t argc, char ** argv )
         UGA_INFO_S( "main", "waiting for workers..." ) ;
         uga_pool_destroy( pool ) ;
         UGA_INFO_S( "main", "destroying resources..." ) ;
-        uga_deallocate( pool ) ;
         uga_str_destroy( &message_1 ) ;
         uga_str_destroy( &message_2 ) ;
         uga_str_destroy( &message_3 ) ;

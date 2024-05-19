@@ -8,6 +8,7 @@
 #define UGA_POOL_H_
 
 #include <core/uga_types.h>
+#include <core/uga_list.h>
 #include <core/uga_vector.h>
 #include <core/uga_thread.h>
 
@@ -15,7 +16,7 @@
 typedef struct
 {
         bool      is_active ;
-        uga_vector    tasks ;
+        uga_dl_list   tasks ;
         uga_vector     pool ;
         uga_mtx_t  task_mtx ;
         uga_semaphore t_sem ;
