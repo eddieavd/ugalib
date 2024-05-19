@@ -48,14 +48,14 @@ i64_t uga_send_to ( uga_socket const * sock, void const * data, i64_t const data
         return bytes_sent ;
 }
 
-i64_t uga_send_str ( uga_socket const * sock, uga_string const * message, i32_t const flags )
+i64_t uga_send_str ( uga_socket const * sock, uga_string_view message, i32_t const flags )
 {
-        return uga_send( sock, message->data, message->size, flags ) ;
+        return uga_send( sock, message.data, message.size, flags ) ;
 }
 
-i64_t uga_send_str_to ( uga_socket const * sock, uga_string const * message, i32_t const flags )
+i64_t uga_send_str_to ( uga_socket const * sock, uga_string_view message, i32_t const flags )
 {
-        return uga_send_to( sock, message->data, message->size, flags ) ;
+        return uga_send_to( sock, message.data, message.size, flags ) ;
 }
 
 i64_t uga_recv ( uga_socket const * sock, void * dest, i64_t const destlen, i32_t const flags )
