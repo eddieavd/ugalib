@@ -1,10 +1,10 @@
 # ugalib
 
 PROJECT = ugalib
-SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c src/core/uga_thread.c src/core/uga_pool.c src/core/uga_list.c
+SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c src/core/uga_thread.c src/core/uga_pool.c src/core/uga_list.c src/net/uga_tftp.c
 
 SOURCES_CORE = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/core/uga_thread.c src/core/uga_pool.c src/core/uga_list.c
-SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c
+SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c src/net/uga_tftp.c
 
 # CC  = clang-18
 # CXX = clang++-18
