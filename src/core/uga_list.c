@@ -7,6 +7,7 @@
 #include <core/uga_list.h>
 #include <core/uga_err.h>
 #include <core/uga_alloc.h>
+#include <core/uga_vector.h>
 
 #include <string.h>
 
@@ -23,6 +24,17 @@ uga_sl_list _uga_sl_list_create ( i64_t const elem_size )
                 .size      =         0 ,
                 .elem_size = elem_size ,
         } ;
+        return list ;
+}
+
+uga_sl_list uga_sl_list_from_vector ( uga_vector const * vector )
+{
+        uga_sl_list list = _uga_sl_list_create( vector->elem_size ) ;
+
+        for( i64_t i = vector->size - 1; i >= 0; --i )
+        {
+                uga_sl_list_push_front( &list, uga_vec_at_ptr( vector, i ) ) ;
+        }
         return list ;
 }
 

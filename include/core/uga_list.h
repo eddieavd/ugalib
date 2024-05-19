@@ -13,6 +13,8 @@
 #define uga_dl_list_create( type ) _uga_dl_list_create( sizeof( type ) )
 
 
+struct uga_vector_t ;
+
 struct uga_sl_node_t
 {
         void                 * data ;
@@ -30,6 +32,8 @@ typedef struct uga_sl_list_t uga_sl_list ;
 
 
 uga_sl_list _uga_sl_list_create ( i64_t const elem_size ) ;
+
+uga_sl_list uga_sl_list_from_vector ( struct uga_vector_t const * vector ) ;
 
 void uga_sl_list_push_back  ( uga_sl_list * this, void * data ) ;
 void uga_sl_list_push_front ( uga_sl_list * this, void * data ) ;
