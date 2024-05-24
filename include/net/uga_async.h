@@ -8,6 +8,7 @@
 #define UGA_ASYNC_H_
 
 #include <core/uga_str.h>
+#include <core/uga_pool.h>
 #include <net/uga_sock.h>
 
 #include <aio.h>
@@ -21,7 +22,7 @@ struct uga_callback_t
 {
         uga_socket * sock ;
         uga_string * data ;
-        bool ( *callback )( struct uga_callback_t * ) ;
+        i32_t ( *callback )( /* struct uga_callback_t * */ void *  ) ;
 } ;
 typedef struct uga_callback_t uga_callback ;
 
@@ -37,6 +38,8 @@ void uga_async_remove_handler ( uga_handler_list * handler_list, uga_socket   co
 
 uga_socket uga_async_has_ready ( uga_handler_list * handler_list ) ;
 i32_t      uga_async_run       ( uga_handler_list * handler_list ) ;
+
+i32_t uga_async_run_on_pool ( uga_handler_list * handler_list, uga_thread_pool * pool ) ;
 
 
 

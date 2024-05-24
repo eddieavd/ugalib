@@ -568,6 +568,40 @@ void uga_dl_list_insert_at ( uga_dl_list * this, i64_t const index, void * data 
         }
 }
 
+uga_dl_node * uga_dl_list_find ( uga_dl_list * this, void * data )
+{
+        uga_dl_node * node = this->head ;
+
+        while( node != NULL )
+        {
+                if( memcmp( node->data, data, this->elem_size ) == 0 )
+                {
+                        return node ;
+                }
+                node = node->next ;
+        }
+        return NULL ;
+}
+
+void uga_dl_list_remove ( uga_dl_list * this, void * data )
+{
+        uga_dl_node * node = this->head ;
+
+        while( node != NULL )
+        {
+                if( memcmp( node->data, data, this->elem_size ) == 0 )
+                {
+                        if( node->prev ) node->prev->next = node->next ;
+                        if( node->next ) node->next->prev = node->prev ;
+
+                        _uga_dl_node_destroy( node ) ;
+
+                        return ;
+                }
+                node = node->next ;
+        }
+}
+
 bool uga_dl_list_empty ( uga_dl_list const * this )
 {
         return this->size == 0 ;

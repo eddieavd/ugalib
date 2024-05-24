@@ -54,6 +54,7 @@ examples: $(LIBFILE)
 	$(CC) $(CFLAGS) examples/files.c  -o $(BINDIR)/files  $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/string.c -o $(BINDIR)/string $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/uga.c    -o $(BINDIR)/uga    $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/tftp_client.c -o $(BINDIR)/tftp_client $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

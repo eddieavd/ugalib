@@ -251,46 +251,35 @@ uga_semaphore uga_sem_init ( i32_t init_val )
 
 void uga_sem_acquire ( uga_semaphore * sem )
 {
-        UGA_DBG_S( "uga::sem::acquire", "acquiring sem mtx..." ) ;
         uga_mtx_acquire( &sem->mtx ) ;
-        UGA_DBG_S( "uga::sem::acquire", "sem mtx acquired" ) ;
 
         if( sem->val > 0 )
         {
-                UGA_DBG_S( "uga::sem::acquire", "semaphore green, decreasing and releasing..." ) ;
                 --sem->val ;
                 uga_mtx_release( &sem->mtx ) ;
                 return ;
         }
-        UGA_DBG_S( "uga::sem::acquire", "semaphore red, waiting for a release..." ) ;
         uga_cnd_wait( &sem->cnd, &sem->mtx ) ;
-        UGA_DBG_S( "uga::sem::acquire", "got a green, decreasing and releasing..." ) ;
         --sem->val ;
         uga_mtx_release( &sem->mtx ) ;
 }
 
 void uga_sem_release ( uga_semaphore * sem )
 {
-        UGA_DBG_S( "uga::sem::release", "acquiring sem mtx..." ) ;
         uga_mtx_acquire( &sem->mtx ) ;
-        UGA_DBG_S( "uga::sem::release", "sem mtx acquired" ) ;
 
         ++sem->val ;
 
-        UGA_DBG_S( "uga::sem::release", "value increased, pinging and releasing..." ) ;
         uga_cnd_ping( &sem->cnd ) ;
         uga_mtx_release( &sem->mtx ) ;
 }
 
 void uga_sem_release_n ( uga_semaphore * sem, i32_t count )
 {
-        UGA_DBG_S( "uga::sem::release_n", "acquiring sem mtx..." ) ;
         uga_mtx_acquire( &sem->mtx ) ;
-        UGA_DBG_S( "uga::sem::release_n", "sem mtx acquired" ) ;
 
         sem->val += count ;
 
-        UGA_DBG_S( "uga::sem::release_n", "value increased, pinging all and releasing..." ) ;
         uga_cnd_ping_all( &sem->cnd ) ;
         uga_mtx_release( &sem->mtx ) ;
 }

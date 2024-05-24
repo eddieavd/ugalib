@@ -71,7 +71,6 @@ i32_t _uga_pool_poll ( void * parent_pool_ptr )
         UGA_DBG_S( "worker::uga::pool::poll", "started." ) ;
 
         uga_vector * task_data = ( uga_vector * ) parent_pool_ptr ;
-        UGA_DBG_S( "worker::uga::pool::poll", "incoming data vector size is %lld", task_data->size ) ;
         uga_thread_pool * pool = *( uga_thread_pool ** ) uga_vec_at( task_data, 0 ) ;
 
         UGA_DBG_S( "worker::uga::pool::poll", "retrieved pointer to pool." ) ;

@@ -102,6 +102,10 @@ void * uga_dl_list_at        ( uga_dl_list * this, i64_t const index            
 void   uga_dl_list_remove_at ( uga_dl_list * this, i64_t const index, void * dest ) ;
 void   uga_dl_list_insert_at ( uga_dl_list * this, i64_t const index, void * data ) ;
 
+uga_dl_node * uga_dl_list_find ( uga_dl_list * this, void * data ) ;
+
+void uga_dl_list_remove ( uga_dl_list * this, void * data ) ;
+
 bool uga_dl_list_empty ( uga_dl_list const * this ) ;
 
 void uga_dl_list_clear ( uga_dl_list * this ) ;

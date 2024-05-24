@@ -10,6 +10,8 @@
 #include <core/uga_util.h>
 #include <core/uga_str.h>
 #include <core/uga_thread.h>
+#include <core/uga_vector.h>
+#include <core/uga_list.h>
 #include <net/uga_async.h>
 
 
@@ -45,11 +47,13 @@ typedef enum
 } uga_tftp_err ;
 
 
+/*
 typedef struct
 {
         u16_t opcode ;
-        u8_t data[ 510 ] ;
+        u8_t data[ 514 ] ;
 } UGA_ALIGN( 8 ) uga_tftp_packet_raw ;
+*/
 
 typedef struct
 {
@@ -86,7 +90,12 @@ typedef struct
 } uga_tftp_err_packet ;
 
 
-uga_tftp_packet uga_tftp_parse_packet ( uga_tftp_packet_raw const raw_packet ) ;
+uga_tftp_packet uga_tftp_parse_packet ( uga_string_view raw_packet ) ;
+
+uga_string uga_tftp_craft_rq_packet ( uga_tftp_opcode const opcode, uga_string_view filename, uga_tftp_mode const mode ) ;
+uga_string uga_tftp_craft_ack_packet ( u16_t const blockno ) ;
+uga_string uga_tftp_craft_err_packet ( uga_tftp_err const errcode ) ;
+uga_string uga_tftp_craft_data_packet ( i64_t blockno, uga_string_view data ) ;
 
 
 typedef enum
@@ -99,18 +108,62 @@ typedef enum
 typedef struct
 {
         uga_tftp_server_mode mode ;
-        uga_task          handler ;
+        uga_string_view      port ;
 } uga_tftp_server_config ;
 
 typedef struct
 {
         i32_t                  id ;
         uga_tftp_server_mode mode ;
-        uga_task          handler ;
+        uga_socket           sock ;
+        uga_dl_list          reqs ; // uga_dl_list< uga_tftp_inflight_request >
 } uga_tftp_server ;
+
+typedef struct
+{
+        uga_tftp_server * server ;
+
+        uga_socket   client ;
+        uga_string filedata ;
+        uga_string last_req ;
+        i32_t     last_ackd ;
+} uga_tftp_inflight_request ;
+
 
 uga_tftp_server uga_tftp_server_create ( uga_tftp_server_config config ) ;
 i32_t           uga_tftp_server_run    ( uga_tftp_server      * server ) ;
 
 
 #endif // UGA_TFTP_H_
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
