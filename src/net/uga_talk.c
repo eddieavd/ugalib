@@ -25,7 +25,7 @@ i64_t uga_send ( uga_socket const * sock, void const * data, i64_t const datalen
         }
         else if( bytes_sent < datalen )
         {
-                UGA_WARN_S( "uga::talk::send", "partial write, wanted %db, sent %db", datalen, bytes_sent ) ;
+ //             UGA_DBG_S( "uga::talk::send", "partial write, wanted %db, sent %db", datalen, bytes_sent ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_WRITE, datalen, bytes_sent ) ;
         }
         return bytes_sent ;
@@ -35,14 +35,17 @@ i64_t uga_send_to ( uga_socket const * sock, void const * data, i64_t const data
 {
         uga_clr_errs() ;
 
-        i64_t bytes_sent = sendto( sock->sockfd, data, datalen, flags, ( _sockaddr_t * ) &sock->addr.addr, sock->addr.addrlen ) ;
+        _sockaddr_t * addrptr = sock->is_connected ? NULL : ( _sockaddr_t * ) &sock->addr.addr    ;
+        _socklen_t    addrlen = sock->is_connected ?    0 :                    sock->addr.addrlen ;
+
+        i64_t bytes_sent = sendto( sock->sockfd, data, datalen, flags, addrptr, addrlen ) ;
         if( bytes_sent == -1 )
         {
                 _uga_check_std_errno() ;
         }
         else if( bytes_sent < datalen )
         {
-                UGA_WARN_S( "uga::talk::send_to", "partial write, wanted %db, sent %db", datalen, bytes_sent ) ;
+//              UGA_DBG_S( "uga::talk::send_to", "partial write, wanted %db, sent %db", datalen, bytes_sent ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_WRITE, datalen, bytes_sent ) ;
         }
         return bytes_sent ;
@@ -69,7 +72,7 @@ i64_t uga_recv ( uga_socket const * sock, void * dest, i64_t const destlen, i32_
         }
         else if( bytes_recvd < destlen )
         {
-                UGA_WARN_S( "uga::talk::recv", "partial read, wanted %db, got %db", destlen, bytes_recvd ) ;
+//              UGA_DBG_S( "uga::talk::recv", "partial read, wanted %db, got %db", destlen, bytes_recvd ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_READ, destlen, bytes_recvd ) ;
         }
         return bytes_recvd ;
@@ -79,14 +82,17 @@ i64_t uga_recv_from ( uga_socket * sock, void * dest, i64_t const destlen, i32_t
 {
         uga_clr_errs() ;
 
-        i64_t bytes_recvd = recvfrom( sock->sockfd, dest, destlen, flags, ( _sockaddr_t * ) &sock->addr.addr, &sock->addr.addrlen ) ;
+        _sockaddr_t * addrptr = sock->is_connected ? NULL : ( _sockaddr_t * ) &sock->addr.addr    ;
+        _socklen_t  * addrlen = sock->is_connected ? NULL : ( _socklen_t  * ) &sock->addr.addrlen ;
+
+        i64_t bytes_recvd = recvfrom( sock->sockfd, dest, destlen, flags, addrptr, addrlen ) ;
         if( bytes_recvd == -1 )
         {
                 _uga_check_std_errno() ;
         }
         else if( bytes_recvd < destlen )
         {
-                UGA_WARN_S( "uga::talk::recv_from", "partial read, wanted %db, got %db", destlen, bytes_recvd ) ;
+//              UGA_DBG_S( "uga::talk::recv_from", "partial read, wanted %db, got %db", destlen, bytes_recvd ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_READ, destlen, bytes_recvd ) ;
         }
         return bytes_recvd ;

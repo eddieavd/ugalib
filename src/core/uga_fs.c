@@ -65,14 +65,15 @@ i32_t uga_fs_file_access ( uga_string_view filepath, i32_t const mode )
 
         if( access( fname_cstr.data, mode ) == 0 )
         {
+                uga_str_destroy( &fname_cstr ) ;
                 return 1 ;
         }
         else
         {
                 _uga_check_std_errno() ;
+                uga_str_destroy( &fname_cstr ) ;
                 return 0 ;
         }
-        uga_str_destroy( &fname_cstr ) ;
 }
 
 i32_t uga_fs_file_exists ( uga_string_view filepath )
@@ -151,7 +152,7 @@ i64_t uga_fs_read_fd ( i32_t const fd, uga_string * dest )
         }
         else if( bytes_read < dest->capacity )
         {
-                UGA_WARN_S( "uga::fs::read_fd", "partial read, wanted %db, got %db", dest->capacity, bytes_read ) ;
+//              UGA_DBG_S( "uga::fs::read_fd", "partial read, wanted %db, got %db", dest->capacity, bytes_read ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_READ, dest->capacity, bytes_read ) ;
         }
         dest->size = bytes_read ;
@@ -170,7 +171,7 @@ i64_t uga_fs_write_fd ( i32_t const fd, uga_string_view data )
         }
         else if( bytes_written < data.size )
         {
-                UGA_WARN_S( "uga::fs::write_fd", "partial write, wanted %db, written %db", data.size, bytes_written ) ;
+//              UGA_DBG_S( "uga::fs::write_fd", "partial write, wanted %db, written %db", data.size, bytes_written ) ;
                 uga_set_io_error( UGA_ERR_PARTIAL_WRITE, data.size, bytes_written ) ;
         }
         return bytes_written ;

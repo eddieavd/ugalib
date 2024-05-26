@@ -4,12 +4,20 @@
 //      uga_log.def
 //
 
-#define UGA_LOG(...)    uga_log_2(               __VA_ARGS__ )
-#define UGA_SUCC(...)   uga_log_2( UGA_LVL_SUCC, __VA_ARGS__ )
-#define UGA_FAIL(...)   uga_log_2( UGA_LVL_FAIL, __VA_ARGS__ )
-#define UGA_LOG_S(...)  uga_log_3(               __VA_ARGS__ )
-#define UGA_SUCC_S(...) uga_log_3( UGA_LVL_SUCC, __VA_ARGS__ )
-#define UGA_FAIL_S(...) uga_log_3( UGA_LVL_FAIL, __VA_ARGS__ )
+#define UGA_LOG(...)    uga_log_2(                             __VA_ARGS__ )
+#define UGA_SUCC(...)   uga_log_2( UGA_LVL_SUCC, UGA_LOG_LONG, __VA_ARGS__ )
+#define UGA_FAIL(...)   uga_log_2( UGA_LVL_FAIL, UGA_LOG_LONG, __VA_ARGS__ )
+#define UGA_LOG_S(...)  uga_log_3(                             __VA_ARGS__ )
+#define UGA_SUCC_S(...) uga_log_3( UGA_LVL_SUCC, UGA_LOG_LONG, __VA_ARGS__ )
+#define UGA_FAIL_S(...) uga_log_3( UGA_LVL_FAIL, UGA_LOG_LONG, __VA_ARGS__ )
+
+#define UGA_S_LOG(...)    uga_log_2(               UGA_LOG_SHORT, __VA_ARGS__ )
+#define UGA_S_SUCC(...)   uga_log_2( UGA_LVL_SUCC, UGA_LOG_SHORT, __VA_ARGS__ )
+#define UGA_S_FAIL(...)   uga_log_2( UGA_LVL_FAIL, UGA_LOG_SHORT, __VA_ARGS__ )
+#define UGA_S_LOG_S(...)  uga_log_3(               UGA_LOG_SHORT, __VA_ARGS__ )
+#define UGA_S_SUCC_S(...) uga_log_3( UGA_LVL_SUCC, UGA_LOG_SHORT, __VA_ARGS__ )
+#define UGA_S_FAIL_S(...) uga_log_3( UGA_LVL_FAIL, UGA_LOG_SHORT, __VA_ARGS__ )
+
 
 #define UGA_DBG(...)
 #define UGA_INFO(...)
@@ -20,30 +28,56 @@
 #define UGA_WARN_S(...)
 #define UGA_ERR_S(...)
 
+#define UGA_S_DBG(...)
+#define UGA_S_INFO(...)
+#define UGA_S_WARN(...)
+#define UGA_S_ERR(...)
+#define UGA_S_DBG_S(...)
+#define UGA_S_INFO_S(...)
+#define UGA_S_WARN_S(...)
+#define UGA_S_ERR_S(...)
+
+
 #if UGA_LOG_LVL > 0
 #       undef  UGA_ERR
 #       undef  UGA_ERR_S
-#       define UGA_ERR(...)   uga_log_2( UGA_LVL_ERR , __VA_ARGS__ )
-#       define UGA_ERR_S(...) uga_log_3( UGA_LVL_ERR , __VA_ARGS__ )
+#       undef  UGA_S_ERR
+#       undef  UGA_S_ERR_S
+#       define UGA_ERR(...)     uga_log_2( UGA_LVL_ERR, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_ERR_S(...)   uga_log_3( UGA_LVL_ERR, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_S_ERR(...)   uga_log_2( UGA_LVL_ERR, UGA_LOG_SHORT, __VA_ARGS__ )
+#       define UGA_S_ERR_S(...) uga_log_3( UGA_LVL_ERR, UGA_LOG_SHORT, __VA_ARGS__ )
 #endif
 
 #if UGA_LOG_LVL > 1
 #       undef  UGA_WARN
 #       undef  UGA_WARN_S
-#       define UGA_WARN(...)   uga_log_2( UGA_LVL_WARN, __VA_ARGS__ )
-#       define UGA_WARN_S(...) uga_log_3( UGA_LVL_WARN, __VA_ARGS__ )
+#       undef  UGA_S_WARN
+#       undef  UGA_S_WARN_S
+#       define UGA_WARN(...)     uga_log_2( UGA_LVL_WARN, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_WARN_S(...)   uga_log_3( UGA_LVL_WARN, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_S_WARN(...)   uga_log_2( UGA_LVL_WARN, UGA_LOG_SHORT, __VA_ARGS__ )
+#       define UGA_S_WARN_S(...) uga_log_3( UGA_LVL_WARN, UGA_LOG_SHORT, __VA_ARGS__ )
 #endif
 
 #if UGA_LOG_LVL > 2
 #       undef  UGA_INFO
 #       undef  UGA_INFO_S
-#       define UGA_INFO(...)   uga_log_2( UGA_LVL_INFO, __VA_ARGS__ )
-#       define UGA_INFO_S(...) uga_log_3( UGA_LVL_INFO, __VA_ARGS__ )
+#       undef  UGA_S_INFO
+#       undef  UGA_S_INFO_S
+#       define UGA_INFO(...)     uga_log_2( UGA_LVL_INFO, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_INFO_S(...)   uga_log_3( UGA_LVL_INFO, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_S_INFO(...)   uga_log_2( UGA_LVL_INFO, UGA_LOG_SHORT, __VA_ARGS__ )
+#       define UGA_S_INFO_S(...) uga_log_3( UGA_LVL_INFO, UGA_LOG_SHORT, __VA_ARGS__ )
 #endif
 
 #if UGA_LOG_LVL > 3
 #       undef  UGA_DBG
 #       undef  UGA_DBG_S
-#       define UGA_DBG(...)    uga_log_2( UGA_LVL_DEB , __VA_ARGS__ )
-#       define UGA_DBG_S(...)  uga_log_3( UGA_LVL_DBG , __VA_ARGS__ )
+#       undef  UGA_S_DBG
+#       undef  UGA_S_DBG_S
+#       define UGA_DBG(...)      uga_log_2( UGA_LVL_DBG, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_DBG_S(...)    uga_log_3( UGA_LVL_DBG, UGA_LOG_LONG , __VA_ARGS__ )
+#       define UGA_S_DBG(...)    uga_log_2( UGA_LVL_DBG, UGA_LOG_SHORT, __VA_ARGS__ )
+#       define UGA_S_DBG_S(...)  uga_log_3( UGA_LVL_DBG, UGA_LOG_SHORT, __VA_ARGS__ )
 #endif

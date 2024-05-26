@@ -303,7 +303,7 @@ void uga_reverse_lookup ( uga_string_view ip, uga_string_view port, char * host,
 
 uga_socket uga_sock_create_configured ( uga_string_view host, uga_string_view service, uga_sock_conf const * conf )
 {
-        uga_socket   sock = { -1, { 0 } } ;
+        uga_socket   sock = { false, -1, { 0 } } ;
         uga_addrinfo addr = uga_addrinfo_get_configured( host, service, conf ) ;
 
         if( uga_had_errs() ) return sock ;
@@ -327,10 +327,7 @@ uga_socket uga_sock_create_and_bind_configured ( uga_string_view host, uga_strin
 
         if( uga_had_errs() ) return sock ;
 
-        if( bind( sock.sockfd, ( _sockaddr_t * ) &sock.addr.addr, sock.addr.addrlen ) == -1 )
-        {
-                _uga_check_std_errno() ;
-        }
+        uga_sock_bind( &sock ) ;
         return sock ;
 }
 
@@ -340,10 +337,7 @@ uga_socket uga_sock_create_and_connect_configured ( uga_string_view host, uga_st
 
         if( uga_had_errs() ) return sock ;
 
-        if( connect( sock.sockfd, ( _sockaddr_t * ) &sock.addr.addr, sock.addr.addrlen ) == -1 )
-        {
-                _uga_check_std_errno() ;
-        }
+        uga_sock_connect( &sock ) ;
         return sock ;
 }
 
@@ -353,10 +347,7 @@ uga_socket uga_sock_create_and_listen_configured ( uga_string_view service, i32_
 
         if( uga_had_errs() ) return sock ;
 
-        if( listen( sock.sockfd, backlog ) == -1 )
-        {
-                _uga_check_std_errno() ;
-        }
+        uga_sock_listen( &sock, backlog ) ;
         return sock ;
 }
 
@@ -380,28 +371,29 @@ uga_socket uga_sock_create_and_listen ( uga_string_view service, i32_t const bac
         return uga_sock_create_and_listen_configured( service, backlog, &uga_default_sock_config ) ;
 }
 
-void uga_sock_bind ( uga_socket const sock )
+void uga_sock_bind ( uga_socket * sock )
 {
         uga_clr_errs() ;
-        if( bind( sock.sockfd, ( _sockaddr_t * ) &sock.addr.addr, sock.addr.addrlen ) == -1 )
+        if( bind( sock->sockfd, ( _sockaddr_t * ) &sock->addr.addr, sock->addr.addrlen ) == -1 )
         {
                 _uga_check_std_errno() ;
         }
 }
 
-void uga_sock_connect ( uga_socket const sock )
+void uga_sock_connect ( uga_socket * sock )
 {
         uga_clr_errs() ;
-        if( connect( sock.sockfd, ( _sockaddr_t * ) &sock.addr.addr, sock.addr.addrlen ) == -1 )
+        if( connect( sock->sockfd, ( _sockaddr_t * ) &sock->addr.addr, sock->addr.addrlen ) == -1 )
         {
                 _uga_check_std_errno() ;
         }
+        else sock->is_connected = true ;
 }
 
-void uga_sock_listen ( uga_socket const sock, i32_t const backlog )
+void uga_sock_listen ( uga_socket * sock, i32_t const backlog )
 {
         uga_clr_errs() ;
-        if( listen( sock.sockfd, backlog ) == -1 )
+        if( listen( sock->sockfd, backlog ) == -1 )
         {
                 _uga_check_std_errno() ;
         }
@@ -414,7 +406,7 @@ uga_socket uga_sock_accept ( uga_socket const listen_sock )
         uga_sockaddr_storage remote_addr ;
         _socklen_t remote_addrlen = sizeof( remote_addr ) ;
 
-        uga_socket remote_sock = { -1, { 0 } } ;
+        uga_socket remote_sock = { false, -1, { 0 } } ;
 
         remote_sock.sockfd = accept( listen_sock.sockfd, ( _sockaddr_t * ) &remote_addr, &remote_addrlen ) ;
         if( remote_sock.sockfd == -1 )
@@ -422,17 +414,24 @@ uga_socket uga_sock_accept ( uga_socket const listen_sock )
                 _uga_check_std_errno() ;
                 return remote_sock ;
         }
+        remote_sock.is_connected = true ;
+
         remote_sock.addr = uga_addrinfo_from_sockaddr( remote_addr ) ;
 
         return remote_sock ;
 }
 
-void uga_sock_close ( uga_socket const * sock )
+void uga_sock_close ( uga_socket * sock )
 {
         uga_fs_close( sock->sockfd ) ;
 }
 
-void uga_sock_shutdown ( uga_socket const * sock, i32_t const mode )
+void uga_sock_close_void ( void * sock )
+{
+        uga_sock_close( sock ) ;
+}
+
+void uga_sock_shutdown ( uga_socket * sock, i32_t const mode )
 {
         if( shutdown( sock->sockfd, mode ) == -1 )
         {

@@ -1,7 +1,7 @@
 //
 //
 //      uganet
-//      uga.c
+//      tftp::server.c
 //
 
 #include <core/uga_log.h>

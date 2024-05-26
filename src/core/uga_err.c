@@ -157,7 +157,7 @@ uga_errtype uga_current_errtype ( void ) { return uga_errdata.type ; }
 
 void _uga_print_errtype ( uga_errtype const errtype, uga_log_lvl const level )
 {
-        uga_log_2( level, "%s", uga_strerror( errtype ) ) ;
+        uga_log_2( level, UGA_LOG_LONG, "%s", uga_strerror( errtype ) ) ;
 }
 
 void uga_print_errtype ( void )
@@ -288,35 +288,35 @@ void _uga_print_std_err ( uga_error_std const * error, uga_log_lvl const level )
 {
         ( void ) error ;
         ( void ) level ;
-        UGA_LOG( level, "libc error: %s", strerror( error->err_no ) ) ;
+        UGA_ERR( "libc error: %s", strerror( error->err_no ) ) ;
 }
 
 void _uga_print_gai_err ( uga_error_gai const * error, uga_log_lvl const level )
 {
         ( void ) error ;
         ( void ) level ;
-        UGA_LOG( level, "gai error: %s", gai_strerror( error->err_no ) ) ;
+        UGA_ERR( "gai error: %s", gai_strerror( error->err_no ) ) ;
 }
 
 void _uga_print_io_err ( uga_error_io const * error, uga_log_lvl const level  )
 {
         ( void ) error ;
         ( void ) level ;
-        UGA_LOG( level, "io error: partial read/write, wanted %db, got %db", error->wanted, error->got ) ;
+        UGA_ERR( "io error: partial read/write, wanted %db, got %db", error->wanted, error->got ) ;
 }
 
 void _uga_print_alloc_err ( uga_error_alloc const * error, uga_log_lvl const level  )
 {
         ( void ) error ;
         ( void ) level ;
-        UGA_LOG( level, "alloc error: failed to alloc %lldb", error->wanted ) ;
+        UGA_ERR( "alloc error: failed to alloc %lldb", error->wanted ) ;
 }
 
 void _uga_print_mem_err ( uga_error_mem const * error, uga_log_lvl const level  )
 {
         ( void ) error ;
         ( void ) level ;
-        UGA_LOG( level, "mem error: block size is %d, bad access at %d", error->size, error->pos ) ;
+        UGA_ERR( "mem error: block size is %d, bad access at %d", error->size, error->pos ) ;
 }
 
 void _uga_print_cli_err ( uga_error_cli const * error, uga_log_lvl const level )
@@ -324,7 +324,7 @@ void _uga_print_cli_err ( uga_error_cli const * error, uga_log_lvl const level )
         ( void ) error ;
         ( void ) level ;
 
-        UGA_LOG( level, "cli error: unknown option or missing option value" ) ;
+        UGA_ERR( "cli error: unknown option or missing option value" ) ;
 }
 
 void _uga_print_thrd_err ( uga_error_thrd const * error, uga_log_lvl const level )
@@ -332,5 +332,5 @@ void _uga_print_thrd_err ( uga_error_thrd const * error, uga_log_lvl const level
         ( void ) error ;
         ( void ) level ;
 
-        UGA_LOG( level, "%s on thread %ull", uga_strerror( error->type ), error->thread_id ) ;
+        UGA_ERR( "%s on thread %ull", uga_strerror( error->type ), error->thread_id ) ;
 }

@@ -25,7 +25,7 @@ typedef struct
 } uga_thread_pool ;
 
 
-uga_thread_pool * uga_pool_create_new ( i32_t const num_threads ) ;
+uga_thread_pool * uga_pool_create ( i32_t const num_threads ) ;
 
 void uga_pool_add_task ( uga_thread_pool * pool, uga_task task ) ;
 

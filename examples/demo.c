@@ -75,11 +75,11 @@ int main ( i32_t argc, char ** argv )
 
         uga_log_init() ;
 
-        UGA_LOG( 10, "some log" ) ;
+        UGA_LOG( 10, UGA_LOG_LONG, "some log" ) ;
 
         UGA_INFO_S( "main", "logs initialized" ) ;
 
-        uga_thread_pool * pool = uga_pool_create_new( 4 ) ;
+        uga_thread_pool * pool = uga_pool_create( 4 ) ;
 
         UGA_INFO_S( "main", "created thread pool" ) ;
 

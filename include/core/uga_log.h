@@ -34,15 +34,21 @@ typedef enum
         UGA_LVL_DBG  ,
 } uga_log_lvl ;
 
+typedef enum
+{
+        UGA_LOG_SHORT ,
+        UGA_LOG_LONG  ,
+} uga_log_type ;
+
 _timespec_t uga_time_empty     ( void ) ;
 _timespec_t uga_time_current   ( void ) ;
 _timespec_t uga_time_current_m ( void ) ;
 
-void uga_log_2 ( uga_log_lvl level,                     char const * fmt, ... ) ;
-void uga_log_3 ( uga_log_lvl level, char const * scope, char const * fmt, ... ) ;
+void uga_log_2 ( uga_log_lvl level, uga_log_type type,                     char const * fmt, ... ) ;
+void uga_log_3 ( uga_log_lvl level, uga_log_type type, char const * scope, char const * fmt, ... ) ;
 
-void uga_log_2_v ( uga_log_lvl level,                     char const * fmt, va_list args ) ;
-void uga_log_3_v ( uga_log_lvl level, char const * scope, char const * fmt, va_list args ) ;
+void uga_log_2_v ( uga_log_lvl level, uga_log_type type,                     char const * fmt, va_list args ) ;
+void uga_log_3_v ( uga_log_lvl level, uga_log_type type, char const * scope, char const * fmt, va_list args ) ;
 
 void uga_log_sys ( i32_t const level, i32_t const facility, char const * fmt, ... ) ;
 

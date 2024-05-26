@@ -107,6 +107,7 @@ static uga_sock_conf uga_default_sock_config = { UGA_SFAM_UNSPEC, UGA_SOCK_STREA
 
 typedef struct
 {
+        bool is_connected ;
         i32_t      sockfd ;
         uga_addrinfo addr ;
 } uga_socket ;
@@ -174,15 +175,17 @@ uga_socket uga_sock_create_and_connect ( uga_string_view host, uga_string_view s
 
 uga_socket uga_sock_create_and_listen ( uga_string_view service, i32_t const backlog ) ;
 
-void uga_sock_bind    ( uga_socket const sock ) ;
-void uga_sock_connect ( uga_socket const sock ) ;
+void uga_sock_bind    ( uga_socket * sock ) ;
+void uga_sock_connect ( uga_socket * sock ) ;
 
-void uga_sock_listen ( uga_socket const sock, i32_t const backlog ) ;
+void uga_sock_listen ( uga_socket * sock, i32_t const backlog ) ;
 
 uga_socket uga_sock_accept ( uga_socket const listenfd ) ;
 
-void uga_sock_close    ( uga_socket const * sock                   ) ;
-void uga_sock_shutdown ( uga_socket const * sock, i32_t const mode ) ;
+void uga_sock_close    ( uga_socket * sock                   ) ;
+void uga_sock_shutdown ( uga_socket * sock, i32_t const mode ) ;
+
+void uga_sock_close_void ( void * sock ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// byte order conversions

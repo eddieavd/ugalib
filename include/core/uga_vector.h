@@ -14,6 +14,8 @@
 #define uga_vec_create_d_0( type,      dtor ) _uga_vec_create_d_0(      dtor, sizeof( type ) )
 #define uga_vec_create_d_1( type, cap, dtor ) _uga_vec_create_d_1( cap, dtor, sizeof( type ) )
 
+#define uga_vec_fits_type( vec, type ) sizeof( type ) == vec.elem_size
+
 
 struct uga_vector_t
 {

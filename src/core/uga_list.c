@@ -583,18 +583,45 @@ uga_dl_node * uga_dl_list_find ( uga_dl_list * this, void * data )
         return NULL ;
 }
 
-void uga_dl_list_remove ( uga_dl_list * this, void * data )
+uga_dl_node * uga_dl_list_find_if ( uga_dl_list * this, bool ( *predicate )( void * data, void * extra ), void * extra )
 {
         uga_dl_node * node = this->head ;
 
         while( node != NULL )
         {
-                if( memcmp( node->data, data, this->elem_size ) == 0 )
+                if( predicate( node->data, extra ) )
                 {
+                        return node ;
+                }
+                node = node->next ;
+        }
+        return NULL ;
+}
+
+void uga_dl_list_remove ( uga_dl_list * this, uga_dl_node * node )
+{
+        if( this->head == node ) this->head = node->next ;
+        if( node->prev ) node->prev->next = node->next ;
+        if( node->next ) node->next->prev = node->prev ;
+
+        _uga_dl_node_destroy( node ) ;
+        --this->size ;
+}
+
+void uga_dl_list_remove_elem ( uga_dl_list * this, void * data )
+{
+        uga_dl_node * node = this->head ;
+
+        while( node != NULL )
+        {
+                if( node->data && memcmp( node->data, data, this->elem_size ) == 0 )
+                {
+                        if( this->head == node ) this->head = node->next ;
                         if( node->prev ) node->prev->next = node->next ;
                         if( node->next ) node->next->prev = node->prev ;
 
                         _uga_dl_node_destroy( node ) ;
+                        --this->size ;
 
                         return ;
                 }
@@ -609,9 +636,12 @@ bool uga_dl_list_empty ( uga_dl_list const * this )
 
 void uga_dl_list_clear ( uga_dl_list * this )
 {
-        while( this->size )
+        while( this->head )
         {
-                uga_dl_list_pop_front( this, NULL ) ;
+                uga_dl_node * to_destroy = this->head ;
+                this->head = this->head->next ;
+
+                _uga_dl_node_destroy( to_destroy ) ;
         }
 }
 

@@ -1,10 +1,10 @@
 # ugalib
 
 PROJECT = ugalib
-SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c src/core/uga_thread.c src/core/uga_pool.c src/core/uga_list.c src/net/uga_tftp.c
+SOURCES = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/net/uga_sock.c src/net/uga_talk.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/net/uga_async.c src/core/uga_thread.c src/core/uga_pool.c src/core/uga_list.c src/net/uga_ftp.c
 
 SOURCES_CORE = src/core/uga_err.c src/core/uga_log.c src/core/uga_fs.c src/core/uga_alloc.c src/core/uga_str.c src/core/uga_cli.c src/core/uga_strview.c src/core/uga_vector.c src/core/uga_thread.c src/core/uga_pool.c src/core/uga_list.c
-SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c src/net/uga_tftp.c
+SOURCES_NET  = src/net/uga_sock.c src/net/uga_talk.c src/net/uga_async.c src/net/uga_ftp.c
 
 # CC  = clang-18
 # CXX = clang++-18
@@ -53,8 +53,8 @@ examples: $(LIBFILE)
 	$(CC) $(CFLAGS) examples/server.c -o $(BINDIR)/server $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/files.c  -o $(BINDIR)/files  $(LDFLAGS)
 	$(CC) $(CFLAGS) examples/string.c -o $(BINDIR)/string $(LDFLAGS)
-	$(CC) $(CFLAGS) examples/uga.c    -o $(BINDIR)/uga    $(LDFLAGS)
-	$(CC) $(CFLAGS) examples/tftp_client.c -o $(BINDIR)/tftp_client $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/tftp/server.c -o $(BINDIR)/tftp_server $(LDFLAGS)
+	$(CC) $(CFLAGS) examples/tftp/client.c -o $(BINDIR)/tftp_client $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -75,11 +75,11 @@ install:
 .PHONY: clean
 clean:
 	for file in $(CLEANEXTS); do rm -f *.$$file; rm -f src/core/*.$$file; rm -f src/net/*.$$file; rm -f lib/*.$$file; rm -f ../lib/*$$file; done
-	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test
+	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(BINDIR)/tftp_server $(BINDIR)/tftp_client $(TESTDIR)/test
 
 .PHONY: cleanall
 cleanall:
 	for file in $(CLEANEXTS); do rm -f *.$$file; rm -f src/core/*.$$file; rm -f src/net/*.$$file; rm -f lib/*.$$file; rm -f ../lib/*$$file; done
-	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(TESTDIR)/test
+	-rm -f $(BINDIR)/demo $(BINDIR)/client $(BINDIR)/server $(BINDIR)/files $(BINDIR)/string $(BINDIR)/tftp_server $(BINDIR)/tftp_client $(TESTDIR)/test
 	-rm -rf $(INSTALL_IDIR)
 	-rm -f $(INSTALL_LDIR)/libugalib.a

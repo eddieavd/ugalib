@@ -28,6 +28,35 @@ void uga_async_read ( uga_callback * callback )
         }
 }
 
+uga_socket uga_async_next ( uga_vector/*<uga_socket>*/ sockets )
+{
+        fd_set fds, fdr ;
+        FD_ZERO( &fds ) ;
+
+        i32_t max_fd = 0 ;
+
+        for( i32_t i = 0; i < sockets.size; ++i )
+        {
+                uga_socket * socket = uga_vec_at( &sockets, i ) ;
+
+                FD_SET( socket->sockfd, &fds ) ;
+                if( socket->sockfd > max_fd ) max_fd = socket->sockfd ;
+        }
+        while( fdr = fds, select( max_fd + 1, &fdr, NULL, NULL, NULL ) > 0 )
+        {
+                for( i32_t i = 0; i < sockets.size; ++i )
+                {
+                        uga_socket * socket = uga_vec_at( &sockets, i ) ;
+                        if( FD_ISSET( socket->sockfd, &fdr ) )
+                        {
+                                return *socket ;
+                        }
+                }
+        }
+//      uga_set_async_error() ;
+        return ( uga_socket ){ 0, -1, { 0 } } ;
+}
+
 void uga_async_add_handler ( uga_handler_list * handler_list, uga_callback const * callback )
 {
         uga_clr_errs() ;

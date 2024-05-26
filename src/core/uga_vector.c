@@ -72,7 +72,7 @@ uga_vector uga_vec_move ( uga_vector * other )
 
 bool uga_vec_empty ( uga_vector const * this )
 {
-        return !this->data || this->size == 0 ;
+        return this->size == 0 ;
 }
 
 i64_t uga_vec_space_left ( uga_vector const * this )
@@ -132,7 +132,7 @@ void uga_vec_shrink_to_fit ( uga_vector * this )
 
 void uga_vec_push_back ( uga_vector * this, void * value )
 {
-        if( uga_vec_empty( this ) || uga_vec_space_left( this ) < 1 )
+        if( !this->data || uga_vec_space_left( this ) < 1 )
         {
                 uga_vec_reserve( this, this->capacity == 0 ? 1 : this->capacity * 2 ) ;
         }
